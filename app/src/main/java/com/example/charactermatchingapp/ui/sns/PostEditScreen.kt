@@ -94,7 +94,8 @@ fun PostCreationScreen() {
                     .fillMaxWidth()
                     .aspectRatio(1f) // 1:1の正方形
                     .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp))
-                    .clickable(enabled = imageUri == null) {
+                    // 画像設定後もクリックして選び直せるように変更
+                    .clickable {
                         galleryLauncher.launch("image/*")
                     }
             ) {
@@ -114,19 +115,9 @@ fun PostCreationScreen() {
                             .clip(RoundedCornerShape(8.dp)),
                         contentScale = ContentScale.Crop
                     )
-                    IconButton(
-                        onClick = { imageUri = null },
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(8.dp)
-                            .background(Color.Black.copy(alpha = 0.5f), CircleShape)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "取消",
-                            tint = Color.White
-                        )
-                    }
+                    // --- ここからIconButtonのブロックを削除 ---
+                    // IconButton( ... ) { ... }
+                    // --- ここまでを削除しました ---
                 }
             }
         }
