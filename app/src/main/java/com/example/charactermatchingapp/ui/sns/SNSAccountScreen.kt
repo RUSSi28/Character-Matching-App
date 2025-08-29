@@ -32,7 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.charactermatchingapp.R
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 
 
 // --- データクラスの定義 ---
@@ -199,7 +199,7 @@ fun ProfileScreen(
                 accountName = accountName,
                 profileText = profileText
             )
-            Divider(color = Color.LightGray, thickness = 1.dp)
+            HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
         }
 
         // 2. 投稿リスト部分 (postsリストの要素数だけPostItemを繰り返し表示)
@@ -210,7 +210,7 @@ fun ProfileScreen(
                 postText = post.postText,
                 postImageResId = post.postImageResId
             )
-            Divider(color = Color.LightGray, thickness = 1.dp)
+            HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
         }
     }
 }
