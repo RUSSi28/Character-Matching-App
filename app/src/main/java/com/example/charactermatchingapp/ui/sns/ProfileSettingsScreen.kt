@@ -8,9 +8,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,7 +30,9 @@ fun AccountSettingsScreen() {
     var headerUri by remember { mutableStateOf<Uri?>(null) }
     var iconUri by remember { mutableStateOf<Uri?>(null) }
     var accountName by remember { mutableStateOf("User Name") }
-    var profileText by remember { mutableStateOf("ここにプロフィール文が入ります。この画面全体がスクロールできます。") }
+    var tag1 by remember { mutableStateOf("ケモ耳") } // プレビュー用に初期値設定
+    var tag2 by remember { mutableStateOf("ショートカット") }
+    var tag3 by remember { mutableStateOf("インナーカラー") }
 
     val headerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -53,14 +56,14 @@ fun AccountSettingsScreen() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
         ) {
             // --- ヘッダーとアイコン画像 ---
-            Box( // Box内で要素を重ねて表示
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
             ) {
-                // 1. ヘッダー画像 (一番下に描画)
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -86,20 +89,19 @@ fun AccountSettingsScreen() {
                     }
                 }
 
-                // 2. ヘッダー下のライン (ヘッダーの上、アイコンの下に描画)
                 HorizontalDivider(
                     modifier = Modifier
-                        .align(Alignment.BottomCenter) // Boxの底を基準に
-                        .offset(y = (-40).dp),         // 40dp上にずらす（ヘッダー画像の底辺に一致）
+                        .align(Alignment.BottomCenter)
+                        .offset(y = (-40).dp),
                     thickness = 1.dp,
                     color = Color.LightGray
                 )
 
-                // 3. アイコン画像 (一番上に描画)
+                // ★★★ アイコン画像を中央に配置 ★★★
                 Box(
                     modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(start = 16.dp)
+                        .align(Alignment.BottomCenter) // 中央寄せに変更
+                        .offset(y = 10.dp) // 下からのオフセットは維持
                         .size(80.dp)
                         .clip(CircleShape)
                         .background(Color.White)
@@ -143,22 +145,55 @@ fun AccountSettingsScreen() {
                     OutlinedTextField(
                         value = accountName,
                         onValueChange = { accountName = it },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp) // ★★★ 最小の高さを設定 ★★★
                     )
                 }
-                // プロフィール文
+
+                // タグ1
                 Column {
                     Text(
-                        text = "プロフィール文",
+                        text = "タグ1",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary
                     )
                     OutlinedTextField(
-                        value = profileText,
-                        onValueChange = { profileText = it },
+                        value = tag1,
+                        onValueChange = { tag1 = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(120.dp)
+                            .heightIn(min = 48.dp) // ★★★ 最小の高さを設定 ★★★
+                    )
+                }
+                // タグ2
+                Column {
+                    Text(
+                        text = "タグ2",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    OutlinedTextField(
+                        value = tag2,
+                        onValueChange = { tag2 = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp) // ★★★ 最小の高さを設定 ★★★
+                    )
+                }
+                // タグ3
+                Column {
+                    Text(
+                        text = "タグ3",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    OutlinedTextField(
+                        value = tag3,
+                        onValueChange = { tag3 = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp) // ★★★ 最小の高さを設定 ★★★
                     )
                 }
             }
@@ -180,4 +215,3 @@ fun AccountSettingsScreenPreview() {
         AccountSettingsScreen()
     }
 }
-
