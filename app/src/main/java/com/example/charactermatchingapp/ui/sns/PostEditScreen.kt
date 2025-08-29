@@ -6,50 +6,31 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.example.charactermatchingapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostCreationScreen() {
-    var text by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var characterName by remember { mutableStateOf("") }
+    var tag1 by remember { mutableStateOf("") }
+    var tag2 by remember { mutableStateOf("") }
+    var tag3 by remember { mutableStateOf("") }
+
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -78,42 +59,15 @@ fun PostCreationScreen() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // --- ユーザーアイコンと投稿文入力エリア ---
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.post_example2), // 仮のアイコン
-                    contentDescription = "User Icon",
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop // アイコン画像を余白なく表示
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-
-                OutlinedTextField(
-                    value = text,
-                    onValueChange = { text = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    placeholder = { Text("投稿文") }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             // --- イラスト画像プレビューエリア ---
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f) // 1:1の正方形
                     .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp))
-                    // 画像設定後もクリックして選び直せるように変更
                     .clickable {
                         galleryLauncher.launch("image/*")
                     }
@@ -136,6 +90,68 @@ fun PostCreationScreen() {
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // --- キャラ名・タグ入力エリア ---
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp) // 各要素間のスペースを調整
+            ) {
+                // ★★★ ここからレイアウト変更 ★★★
+                // キャラ名
+                Column {
+                    Text(
+                        text = "キャラ名",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    OutlinedTextField(
+                        value = characterName,
+                        onValueChange = { characterName = it },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                // タグ1
+                Column {
+                    Text(
+                        text = "タグ1",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    OutlinedTextField(
+                        value = tag1,
+                        onValueChange = { tag1 = it },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                // タグ2
+                Column {
+                    Text(
+                        text = "タグ2",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    OutlinedTextField(
+                        value = tag2,
+                        onValueChange = { tag2 = it },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                // タグ3
+                Column {
+                    Text(
+                        text = "タグ3",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    OutlinedTextField(
+                        value = tag3,
+                        onValueChange = { tag3 = it },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                // ★★★ ここまでレイアウト変更 ★★★
+            }
         }
     }
 }
@@ -143,11 +159,10 @@ fun PostCreationScreen() {
 @Preview(showBackground = true)
 @Composable
 fun PostCreationScreenPreview() {
-    // プレビューにもテーマを適用すると配色の確認ができます
     MaterialTheme(
         colorScheme = lightColorScheme(
-            primary = Color(0xFF007AFF), // 青色
-            background = Color.White // 背景を白
+            primary = Color(0xFF007AFF),
+            background = Color.White
         )
     ) {
         PostCreationScreen()
