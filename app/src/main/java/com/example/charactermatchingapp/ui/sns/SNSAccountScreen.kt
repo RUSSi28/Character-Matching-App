@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -52,14 +53,31 @@ import com.example.charactermatchingapp.R
 
 
 // --- データクラスの定義 ---
+data class Profile(
+    val accountName: String,
+    val headerImageResId: Int,
+    val iconImageResId: Int,
+    val profiletag1: String,
+    val profiletag2: String,
+    val profiletag3: String
+) {
+    val profileText: String
+        get() = "#$profiletag1　#$profiletag2　#$profiletag3"
+}
+
 data class Post(
     val id: Int,
     val userName: String,
     val userIconResId: Int,
     val characterName: String,
-    val postText: String,
-    val postImageResId: Int
-)
+    val postImageResId: Int,
+    val posttag1: String,
+    val posttag2: String,
+    val posttag3: String
+) {
+    val postText: String
+        get() = "#$posttag1　#$posttag2　#$posttag3"
+}
 
 // --- UIコンポーネント ---
 @Composable
@@ -107,10 +125,18 @@ fun PostItem(
         ) {
             Text(text = characterName, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(12.dp))
+
+            val textColor = if (LocalInspectionMode.current) {
+                Color(0xFF007AFF)
+            } else {
+                Color.Unspecified
+            }
+
             Text(
                 text = postText,
                 fontSize = 14.sp,
-                lineHeight = 22.sp
+                lineHeight = 22.sp,
+                color = textColor
             )
         }
     }
@@ -118,15 +144,12 @@ fun PostItem(
 
 @Composable
 fun ProfileHeader(
-    headerImageResId: Int,
-    iconImageResId: Int,
-    accountName: String,
-    profileText: String
+    profile: Profile
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Image(
-                painter = painterResource(id = headerImageResId),
+                painter = painterResource(id = profile.headerImageResId),
                 contentDescription = "Header Image",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -134,40 +157,50 @@ fun ProfileHeader(
                 contentScale = ContentScale.Crop
             )
             Image(
-                painter = painterResource(id = iconImageResId),
+                painter = painterResource(id = profile.iconImageResId),
                 contentDescription = "Icon Image",
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .offset(y = 60.dp)
-                    .size(100.dp)
+                    .offset(y = 40.dp)
+                    .size(80.dp)
                     .background(Color.White, CircleShape)
                     .clip(CircleShape)
                     .border(2.dp, Color.White, CircleShape),
                 contentScale = ContentScale.Crop
             )
         }
-        Spacer(modifier = Modifier.height(60.dp))
+        Spacer(modifier = Modifier.height(56.dp))
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = accountName,
+                text = profile.accountName,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
-            //Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
+                // ★★★ ここから変更 ★★★
+                // プレビューの時だけ色が変わるように設定
+                val textColor = if (LocalInspectionMode.current) {
+                    Color(0xFF007AFF) // プレビューの時は青色
+                } else {
+                    Color.Unspecified // 通常時（アプリ実行時）はテーマのデフォルト色
+                }
+
                 Text(
-                    text = profileText,
+                    text = profile.profileText,
                     modifier = Modifier.fillMaxWidth(),
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center,
+                    color = textColor // 設定した色を適用
                 )
+                // ★★★ ここまで変更 ★★★
             }
         }
     }
@@ -177,10 +210,7 @@ fun ProfileHeader(
 
 @Composable
 fun AccountScreen(
-    headerImageResId: Int,
-    iconImageResId: Int,
-    accountName: String,
-    profileText: String,
+    profile: Profile,
     posts: List<Post>,
     onPostClick: (Post) -> Unit
 ) {
@@ -192,12 +222,7 @@ fun AccountScreen(
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             Column {
-                ProfileHeader(
-                    headerImageResId = headerImageResId,
-                    iconImageResId = iconImageResId,
-                    accountName = accountName,
-                    profileText = profileText
-                )
+                ProfileHeader(profile = profile)
                 HorizontalDivider(thickness = 8.dp, color = Color.LightGray)
             }
         }
@@ -263,24 +288,36 @@ fun TimelineScreen(
 @Preview(showBackground = true, name = "アカウント画面プレビュー")
 @Composable
 fun AccountScreenPreview() {
-    val sampleUser = "User Name"
-    val sampleIcon = R.drawable.post_example2
-    val sampleImage = R.drawable.post_example
+    val sampleProfile = Profile(
+        accountName = "User Name",
+        headerImageResId = R.drawable.post_example,
+        iconImageResId = R.drawable.post_example2,
+        profiletag1 = "イラスト描きます",
+        profiletag2 = "ゲーム好き",
+        profiletag3 = "週末活動"
+    )
 
     val samplePosts = List(10) { i ->
-        Post(id = i, userName = sampleUser, userIconResId = sampleIcon, characterName = "キャラ名 $i", postText = "投稿文 $i", postImageResId = sampleImage)
+        Post(
+            id = i,
+            userName = sampleProfile.accountName,
+            userIconResId = sampleProfile.iconImageResId,
+            characterName = "キャラ名 $i",
+            postImageResId = R.drawable.post_example,
+            posttag1 = "タグA$i",
+            posttag2 = "タグB$i",
+            posttag3 = "タグC$i"
+        )
     }
 
     MaterialTheme(
         colorScheme = lightColorScheme(
+            primary = Color(0xFF007AFF), // ボタン等の色
             background = Color.White
         )
     ) {
         AccountScreen(
-            headerImageResId = R.drawable.post_example2,
-            iconImageResId = R.drawable.post_example2,
-            accountName = sampleUser,
-            profileText = "プロフィール文が入ります。",
+            profile = sampleProfile,
             posts = samplePosts,
             onPostClick = {}
         )
@@ -290,19 +327,33 @@ fun AccountScreenPreview() {
 @Preview(showBackground = true, name = "タイムライン画面プレビュー")
 @Composable
 fun TimelineScreenPreview() {
-    val sampleUser = "User Name"
-    val sampleIcon = R.drawable.post_example2
-    val sampleImage = R.drawable.post_example
-
     val samplePosts = listOf(
-        Post(id = 1, userName = sampleUser, userIconResId = sampleIcon, characterName = "サンプルキャラA", postText = "最新の投稿です！✨", postImageResId = sampleImage),
-        Post(id = 2, userName = sampleUser, userIconResId = sampleIcon, characterName = "サンプルキャラB", postText = "2番目の投稿。", postImageResId = sampleImage),
+        Post(
+            id = 1,
+            userName = "User Name",
+            userIconResId = R.drawable.post_example2,
+            characterName = "サンプルキャラA",
+            postImageResId = R.drawable.post_example,
+            posttag1 = "イラスト",
+            posttag2 = "オリジナル",
+            posttag3 = "女の子"
+        ),
+        Post(
+            id = 2,
+            userName = "User Name",
+            userIconResId = R.drawable.post_example2,
+            characterName = "サンプルキャラB",
+            postImageResId = R.drawable.post_example,
+            posttag1 = "風景",
+            posttag2 = "ファンタジー",
+            posttag3 = "背景"
+        ),
     )
 
     MaterialTheme(
         colorScheme = lightColorScheme(
             background = Color.White,
-            primary = Color(0xFF007AFF) // 青色
+            primary = Color(0xFF007AFF)
         )
     ) {
         TimelineScreen(posts = samplePosts)
