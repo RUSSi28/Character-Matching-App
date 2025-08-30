@@ -424,6 +424,58 @@ fun PosterViewAccountScreen(
     }
 }
 
+/**
+ * お気に入り画面
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FavoritesScreen(
+    posts: List<Post>,
+    onBackClick: () -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("お気に入り") },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "戻る"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                )
+            )
+        }
+    ) { paddingValues ->
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentPadding = PaddingValues(top = 52.dp),
+            verticalArrangement = Arrangement.spacedBy(1.dp),
+            horizontalArrangement = Arrangement.spacedBy(1.dp)
+        ) {
+            items(posts) { post ->
+                Image(
+                    painter = painterResource(id = post.postImageResId),
+                    contentDescription = "Favorite Image ${post.id}",
+                    modifier = Modifier
+                        .aspectRatio(1f) // 正方形
+                        .clickable { /* TODO: 画像クリック時の遷移処理 */ },
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
+    }
+}
+
 // --- ここからプレビュー ---
 @Preview(showBackground = true, name = "アカウント画面プレビュー")
 @Composable
@@ -526,6 +578,26 @@ fun PosterViewAccountScreenPreview() {
             onPostClick = {},
             onEditClick = {},
             onPostFabClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "お気に入り画面プレビュー")
+@Composable
+fun FavoritesScreenPreview() {
+    val samplePosts = List(10) { i ->
+        Post(id = i, userName = "User Name", userIconResId = R.drawable.post_example2, characterName = "キャラ名 $i", postImageResId = R.drawable.post_example, posttag1 = "タグA$i", posttag2 = "タグB$i", posttag3 = "タグC$i")
+    }
+
+    MaterialTheme(
+        colorScheme = lightColorScheme(
+            primary = Color(0xFF007AFF),
+            background = Color.White
+        )
+    ) {
+        FavoritesScreen(
+            posts = samplePosts,
+            onBackClick = {}
         )
     }
 }
