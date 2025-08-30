@@ -477,6 +477,26 @@ fun FavoritesScreen(
 }
 
 // --- ここからプレビュー ---
+@Preview(showBackground = true, name = "投稿アイテムプレビュー")
+@Composable
+fun PostItemPreview() {
+    MaterialTheme(
+        colorScheme = lightColorScheme(
+            primary = Color(0xFF007AFF),
+            background = Color.White
+        )
+    ) {
+        PostItem(
+            userIconResId = R.drawable.post_example2,
+            userName = "User Name",
+            characterName = "サンプルキャラA",
+            postText = "#イラスト　#オリジナル　#女の子",
+            postImageResId = R.drawable.post_example
+        )
+    }
+}
+
+
 @Preview(showBackground = true, name = "アカウント画面プレビュー")
 @Composable
 fun AccountScreenPreview() {
