@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -26,7 +27,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,6 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.charactermatchingapp.R
+import androidx.compose.material.icons.filled.Add
 
 
 // --- データクラスの定義 ---
@@ -292,6 +296,133 @@ fun TimelineScreen(
     }
 }
 
+/**
+ * 「編集」ボタン付きのプロフィールヘッダー
+ */
+@Composable
+fun EditableProfileHeader(
+    profile: Profile,
+    onEditClick: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Image(
+                painter = painterResource(id = profile.headerImageResId),
+                contentDescription = "Header Image",
+                modifier = Modifier.fillMaxWidth().height(160.dp),
+                contentScale = ContentScale.Crop
+            )
+            Image(
+                painter = painterResource(id = profile.iconImageResId),
+                contentDescription = "Icon Image",
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .offset(y = 40.dp)
+                    .size(80.dp)
+                    .background(Color.White, CircleShape)
+                    .clip(CircleShape)
+                    .border(2.dp, Color.White, CircleShape),
+                contentScale = ContentScale.Crop
+            )
+        }
+        Spacer(modifier = Modifier.height(56.dp))
+        // プロフィール情報と編集ボタンを配置するためのBox
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = profile.accountName,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                ) {
+                    Text(
+                        text = profile.profileText,
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+            // 「編集」ボタンを右上に配置
+            Button(
+                onClick = onEditClick,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(y = (-56).dp), // y方向に少しずらす
+                contentPadding = PaddingValues(horizontal = 16.dp)
+            ) {
+                Text("編集")
+            }
+        }
+    }
+}
+
+/**
+ * 新しいアカウント画面（投稿者用）
+ */
+@Composable
+fun PosterViewAccountScreen(
+    profile: Profile,
+    posts: List<Post>,
+    onPostClick: (Post) -> Unit,
+    onEditClick: () -> Unit,
+    onPostFabClick: () -> Unit
+) {
+    // Scaffoldを使って、メインコンテンツとFloatingActionButtonを分離
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onPostFabClick,
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "投稿",
+                    tint = Color.White
+                )
+            }
+        }
+    ) { paddingValues ->
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues), // Scaffoldからのpaddingを適用
+            verticalArrangement = Arrangement.spacedBy(1.dp),
+            horizontalArrangement = Arrangement.spacedBy(1.dp)
+        ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Column {
+                    EditableProfileHeader(profile = profile, onEditClick = onEditClick)
+                    HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                }
+            }
+            items(posts) { post ->
+                Image(
+                    painter = painterResource(id = post.postImageResId),
+                    contentDescription = "Post Image ${post.id}",
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .clickable { onPostClick(post) },
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
+    }
+}
 
 // --- ここからプレビュー ---
 @Preview(showBackground = true, name = "アカウント画面プレビュー")
@@ -366,5 +497,35 @@ fun TimelineScreenPreview() {
         )
     ) {
         TimelineScreen(posts = samplePosts)
+    }
+}
+
+@Preview(showBackground = true, name = "投稿者用アカウント画面プレビュー")
+@Composable
+fun PosterViewAccountScreenPreview() {
+    val sampleProfile = Profile(
+        accountName = "User Name",
+        headerImageResId = R.drawable.post_example2,
+        iconImageResId = R.drawable.post_example2,
+        profileText = "ここにプロフィール文が入ります。この文章はサンプルです。"
+    )
+
+    val samplePosts = List(10) { i ->
+        Post(id = i, userName = sampleProfile.accountName, userIconResId = sampleProfile.iconImageResId, characterName = "キャラ名 $i", postImageResId = R.drawable.post_example, posttag1 = "タグA$i", posttag2 = "タグB$i", posttag3 = "タグC$i")
+    }
+
+    MaterialTheme(
+        colorScheme = lightColorScheme(
+            primary = Color(0xFF007AFF),
+            background = Color.White
+        )
+    ) {
+        PosterViewAccountScreen(
+            profile = sampleProfile,
+            posts = samplePosts,
+            onPostClick = {},
+            onEditClick = {},
+            onPostFabClick = {}
+        )
     }
 }
