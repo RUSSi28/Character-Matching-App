@@ -57,13 +57,8 @@ data class Profile(
     val accountName: String,
     val headerImageResId: Int,
     val iconImageResId: Int,
-    val profiletag1: String,
-    val profiletag2: String,
-    val profiletag3: String
-) {
     val profileText: String
-        get() = "#$profiletag1　#$profiletag2　#$profiletag3"
-}
+)
 
 data class Post(
     val id: Int,
@@ -142,11 +137,33 @@ fun PostItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileHeader(
-    profile: Profile
+    profile: Profile,
+    onBackClick: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
+        // トップバー
+        TopAppBar(
+            title = { Text("アカウント") },
+            // ★★★ ここで左矢印の戻るボタンを実装 ★★★
+            navigationIcon = {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "戻る"
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                titleContentColor = Color.White,
+                navigationIconContentColor = Color.White
+            )
+        )
+
+        // ヘッダー画像とプロフィール情報
         Box(modifier = Modifier.fillMaxWidth()) {
             Image(
                 painter = painterResource(id = profile.headerImageResId),
@@ -185,26 +202,17 @@ fun ProfileHeader(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                // ★★★ ここから変更 ★★★
-                // プレビューの時だけ色が変わるように設定
-                val textColor = if (LocalInspectionMode.current) {
-                    Color(0xFF007AFF) // プレビューの時は青色
-                } else {
-                    Color.Unspecified // 通常時（アプリ実行時）はテーマのデフォルト色
-                }
-
                 Text(
                     text = profile.profileText,
                     modifier = Modifier.fillMaxWidth(),
                     fontSize = 14.sp,
-                    textAlign = TextAlign.Center,
-                    color = textColor // 設定した色を適用
+                    textAlign = TextAlign.Center
                 )
-                // ★★★ ここまで変更 ★★★
             }
         }
     }
 }
+
 
 // --- 新しいUI ---
 
@@ -212,7 +220,8 @@ fun ProfileHeader(
 fun AccountScreen(
     profile: Profile,
     posts: List<Post>,
-    onPostClick: (Post) -> Unit
+    onPostClick: (Post) -> Unit,
+    onBackClick: () -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -222,8 +231,8 @@ fun AccountScreen(
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             Column {
-                ProfileHeader(profile = profile)
-                HorizontalDivider(thickness = 8.dp, color = Color.LightGray)
+                ProfileHeader(profile = profile, onBackClick = onBackClick)
+                HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
             }
         }
         items(posts) { post ->
@@ -290,11 +299,9 @@ fun TimelineScreen(
 fun AccountScreenPreview() {
     val sampleProfile = Profile(
         accountName = "User Name",
-        headerImageResId = R.drawable.post_example,
+        headerImageResId = R.drawable.post_example2,
         iconImageResId = R.drawable.post_example2,
-        profiletag1 = "イラスト描きます",
-        profiletag2 = "ゲーム好き",
-        profiletag3 = "週末活動"
+        profileText = "ここにプロフィール文が入ります。この文章はサンプルです。"
     )
 
     val samplePosts = List(10) { i ->
@@ -312,14 +319,16 @@ fun AccountScreenPreview() {
 
     MaterialTheme(
         colorScheme = lightColorScheme(
-            primary = Color(0xFF007AFF), // ボタン等の色
-            background = Color.White
+            background = Color.White,
+            primary = Color(0xFF007AFF)
+
         )
     ) {
         AccountScreen(
             profile = sampleProfile,
             posts = samplePosts,
-            onPostClick = {}
+            onPostClick = {},
+            onBackClick = {}
         )
     }
 }
