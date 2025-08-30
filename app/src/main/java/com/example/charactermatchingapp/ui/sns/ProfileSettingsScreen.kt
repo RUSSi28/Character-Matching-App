@@ -30,9 +30,7 @@ fun AccountSettingsScreen() {
     var headerUri by remember { mutableStateOf<Uri?>(null) }
     var iconUri by remember { mutableStateOf<Uri?>(null) }
     var accountName by remember { mutableStateOf("User Name") }
-    var tag1 by remember { mutableStateOf("ケモ耳") } // プレビュー用に初期値設定
-    var tag2 by remember { mutableStateOf("ショートカット") }
-    var tag3 by remember { mutableStateOf("インナーカラー") }
+    var profileText by remember { mutableStateOf("ここにプロフィール文が入ります。") }
 
     val headerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -150,50 +148,18 @@ fun AccountSettingsScreen() {
                             .heightIn(min = 48.dp) // ★★★ 最小の高さを設定 ★★★
                     )
                 }
-
-                // タグ1
                 Column {
                     Text(
-                        text = "タグ1",
+                        text = "プロフィール文",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary
                     )
                     OutlinedTextField(
-                        value = tag1,
-                        onValueChange = { tag1 = it },
+                        value = profileText,
+                        onValueChange = { profileText = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 48.dp) // ★★★ 最小の高さを設定 ★★★
-                    )
-                }
-                // タグ2
-                Column {
-                    Text(
-                        text = "タグ2",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    OutlinedTextField(
-                        value = tag2,
-                        onValueChange = { tag2 = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 48.dp) // ★★★ 最小の高さを設定 ★★★
-                    )
-                }
-                // タグ3
-                Column {
-                    Text(
-                        text = "タグ3",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    OutlinedTextField(
-                        value = tag3,
-                        onValueChange = { tag3 = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 48.dp) // ★★★ 最小の高さを設定 ★★★
+                            .height(120.dp) // 複数行を想定して高さを設定
                     )
                 }
             }
