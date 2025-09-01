@@ -29,7 +29,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -53,7 +52,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.charactermatchingapp.R
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 
 
 // --- データクラスの定義 ---
@@ -369,38 +370,66 @@ fun EditableProfileHeader(
     }
 }
 
+
 /**
  * 新しいアカウント画面（投稿者用）
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PosterViewAccountScreen(
     profile: Profile,
     posts: List<Post>,
     onPostClick: (Post) -> Unit,
-    onEditClick: () -> Unit,
-    onPostFabClick: () -> Unit
+    onEditClick: () -> Unit
 ) {
-    // Scaffoldを使って、メインコンテンツとFloatingActionButtonを分離
     Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onPostFabClick,
-                shape = CircleShape,
-                containerColor = MaterialTheme.colorScheme.primary
+        topBar = {
+            TopAppBar(
+                title = { Text("アカウント") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = Color.White
+                )
+            )
+        },
+        bottomBar = {
+            NavigationBar(
+                modifier = Modifier.height(52.dp), // 高さを指定
+                containerColor = MaterialTheme.colorScheme.primary // 背景色を青に
             ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "投稿",
-                    tint = Color.White
+                val itemColors = NavigationBarItemDefaults.colors(
+                    indicatorColor = Color.White.copy(alpha = 0.3f), // 選択中アイテムの背景色
+                    selectedIconColor = Color.White,
+                    unselectedIconColor = Color.White.copy(alpha = 0.7f)
+                )
+
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { /* TODO */ },
+                    icon = { Text("スワイプ") },
+                    colors = itemColors
+                )
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { /* TODO */ },
+                    icon = { Text("お気に入り") },
+                    colors = itemColors
+                )
+                NavigationBarItem(
+                    selected = true,
+                    onClick = { /* TODO */ },
+                    icon = { Text("アカウント") },
+                    colors = itemColors
                 )
             }
-        }
+        },
+        floatingActionButton = { /* ... */ }
     ) { paddingValues ->
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues), // Scaffoldからのpaddingを適用
+                .padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(1.dp),
             horizontalArrangement = Arrangement.spacedBy(1.dp)
         ) {
@@ -430,27 +459,48 @@ fun PosterViewAccountScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
-    posts: List<Post>,
-    onBackClick: () -> Unit
+    posts: List<Post>
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("お気に入り") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "戻る"
-                        )
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    titleContentColor = Color.White
                 )
             )
+        },
+        bottomBar = {
+            NavigationBar(
+                modifier = Modifier.height(52.dp), // 高さを指定
+                containerColor = MaterialTheme.colorScheme.primary // 背景色を青に
+            ) {
+                val itemColors = NavigationBarItemDefaults.colors(
+                    indicatorColor = Color.White.copy(alpha = 0.3f),
+                    selectedIconColor = Color.White,
+                    unselectedIconColor = Color.White.copy(alpha = 0.7f)
+                )
+
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { /* TODO */ },
+                    icon = { Text("スワイプ") },
+                    colors = itemColors
+                )
+                NavigationBarItem(
+                    selected = true,
+                    onClick = { /* TODO */ },
+                    icon = { Text("お気に入り") },
+                    colors = itemColors
+                )
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { /* TODO */ },
+                    icon = { Text("アカウント") },
+                    colors = itemColors
+                )
+            }
         }
     ) { paddingValues ->
         LazyVerticalGrid(
@@ -458,7 +508,7 @@ fun FavoritesScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(top = 52.dp),
+            contentPadding = PaddingValues(top = 1.dp),
             verticalArrangement = Arrangement.spacedBy(1.dp),
             horizontalArrangement = Arrangement.spacedBy(1.dp)
         ) {
@@ -467,7 +517,7 @@ fun FavoritesScreen(
                     painter = painterResource(id = post.postImageResId),
                     contentDescription = "Favorite Image ${post.id}",
                     modifier = Modifier
-                        .aspectRatio(1f) // 正方形
+                        .aspectRatio(1f)
                         .clickable { /* TODO: 画像クリック時の遷移処理 */ },
                     contentScale = ContentScale.Crop
                 )
@@ -475,6 +525,8 @@ fun FavoritesScreen(
         }
     }
 }
+
+
 
 // --- ここからプレビュー ---
 @Preview(showBackground = true, name = "投稿アイテムプレビュー")
@@ -596,8 +648,7 @@ fun PosterViewAccountScreenPreview() {
             profile = sampleProfile,
             posts = samplePosts,
             onPostClick = {},
-            onEditClick = {},
-            onPostFabClick = {}
+            onEditClick = {}
         )
     }
 }
@@ -615,9 +666,6 @@ fun FavoritesScreenPreview() {
             background = Color.White
         )
     ) {
-        FavoritesScreen(
-            posts = samplePosts,
-            onBackClick = {}
-        )
+        FavoritesScreen(posts = samplePosts)
     }
 }
