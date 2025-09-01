@@ -385,7 +385,7 @@ fun PosterViewAccountScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("アカウント") },
+                title = { Text("") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
@@ -464,7 +464,7 @@ fun FavoritesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("お気に入り") },
+                title = { Text("") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
@@ -508,7 +508,7 @@ fun FavoritesScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(top = 1.dp),
+            contentPadding = PaddingValues(top = 52.dp),
             verticalArrangement = Arrangement.spacedBy(1.dp),
             horizontalArrangement = Arrangement.spacedBy(1.dp)
         ) {
