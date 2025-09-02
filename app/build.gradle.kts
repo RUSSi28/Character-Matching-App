@@ -49,13 +49,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation("io.coil-kt:coil-compose:2.6.0")
-    // Pagingの基本ライブラリ
-    implementation("androidx.paging:paging-runtime-ktx:3.3.0")
-    // Jetpack ComposeでPagingを使うためのライブラリ
-    implementation("androidx.paging:paging-compose:3.3.0")
-    // ViewModelをComposeで簡単に使うためのライブラリ
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+    implementation(libs.kotlinx.collections.immutable)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
