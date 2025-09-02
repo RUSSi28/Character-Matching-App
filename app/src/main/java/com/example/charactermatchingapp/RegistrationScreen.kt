@@ -1,44 +1,55 @@
-package com.example.registration
+package com.example.charactermatchingapp
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.material3.MaterialTheme
-
-
+import coil.compose.rememberAsyncImagePainter
+import androidx.activity.compose.rememberLauncherForActivityResult
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-                CharacterPostScreen()
-            }
+            CharacterPostScreen()
         }
     }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterPostScreen() {
     var name by remember { mutableStateOf(TextFieldValue("")) }
-    var personality by remember { mutableStateOf(TextFieldValue("")) }
     var description by remember { mutableStateOf(TextFieldValue("")) }
 
-    // タグ選択用
-    val tagItems = listOf("タグ1", "タグ2", "タグ3", "タグ4", "タグ5")
-    var expanded by remember { mutableStateOf(false) }
-    var selectedTag by remember { mutableStateOf(tagItems[0]) }
+    // 画像アップロード
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        selectedImageUri = uri
+    }
+
+    // タグ管理
+    var tagInput by remember { mutableStateOf(TextFieldValue("")) }
+    var tags by remember { mutableStateOf(listOf<String>()) }
 
     Scaffold(
         topBar = {
@@ -55,18 +66,30 @@ fun CharacterPostScreen() {
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 仮の画像（ic_launcher_foreground を表示）
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                contentDescription = "キャラ画像",
-                modifier = Modifier.size(120.dp)
-            )
+            // 画像表示
+            if (selectedImageUri != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(selectedImageUri),
+                    contentDescription = "キャラ画像",
+                    modifier = Modifier.size(120.dp),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(120.dp)
+                        .background(Color.Gray, RoundedCornerShape(8.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("No Image", color = Color.White)
+                }
+            }
 
-            Button(onClick = { /* 画像選択処理を後で追加 */ }) {
+            Button(onClick = { launcher.launch("image/*") }) {
                 Text("画像をアップロード")
             }
 
-            // 名前入力
+            // 名前（自由入力）
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -75,51 +98,71 @@ fun CharacterPostScreen() {
                 singleLine = true
             )
 
-            // 性格（自由入力）
-            OutlinedTextField(
-                value = personality,
-                onValueChange = { personality = it },
-                label = { Text("性格") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            // タグ（プルダウン形式）
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }
+            // タグ入力
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
-                    value = selectedTag,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("タグを選択") },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
+                    value = tagInput,
+                    onValueChange = { tagInput = it },
+                    label = { Text("タグを入力") },
+                    modifier = Modifier.weight(1f),
+                    singleLine = true
                 )
-
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                Button(
+                    onClick = {
+                        if (tagInput.text.isNotBlank() && tags.size < 10) {
+                            tags = tags + tagInput.text
+                            tagInput = TextFieldValue("") // 入力欄をクリア
+                        }
+                    }
                 ) {
-                    tagItems.forEach { item ->
-                        DropdownMenuItem(
-                            text = { Text(item) },
-                            onClick = {
-                                selectedTag = item
-                                expanded = false
+                    Text("追加")
+                }
+            }
+
+            // タグ表示（横並び）
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(tags) { tag ->
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        modifier = Modifier
+                            .clickable {
+                                // タップで削除できるようにする（任意）
+                                tags = tags - tag
                             }
+                    ) {
+                        Text(
+                            text = tag,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                         )
                     }
                 }
             }
 
-            // 説明
+            // 説明メッセージ
+            if (tags.isNotEmpty()) {
+                Text(
+                    text = "※ タグをタップすると削除できます",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray,
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .align(Alignment.Start) // 左寄せ
+                )
+            }
+
+            // 説明（自由入力・改行可）
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("キャラクターの簡単な説明") },
+                label = { Text("キャラクターの説明") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp),
@@ -130,7 +173,7 @@ fun CharacterPostScreen() {
 
             // 投稿ボタン
             Button(onClick = {
-                println("投稿: ${name.text}, ${personality.text}, タグ=$selectedTag, ${description.text}")
+                println("投稿: ${name.text}, タグ=$tags, ${description.text}, 画像=$selectedImageUri")
             }) {
                 Text("投稿")
             }
@@ -138,9 +181,6 @@ fun CharacterPostScreen() {
     }
 }
 
-/**
- * プレビュー用
- */
 @Preview(showBackground = true)
 @Composable
 fun CharacterPostScreenPreview() {
