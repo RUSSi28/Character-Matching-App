@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
+import com.example.charactermatchingapp.presentation.gallery.GalleryApp
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
@@ -29,7 +30,7 @@ sealed class Screen(val route: String) {
     data object Matching : Screen("matching")
 
     @Serializable
-    data object Add : Screen("add")
+    data object Gallery : Screen("gallery")
 
     @Serializable
     data object Home : Screen("home")
@@ -40,7 +41,7 @@ sealed class Screen(val route: String) {
 
 private val bottomNavigationAllowedScreen = setOf(
     Screen.Matching,
-    Screen.Add,
+    Screen.Gallery,
     Screen.Home,
     Screen.Settings
 )
@@ -48,7 +49,7 @@ private val bottomNavigationAllowedScreen = setOf(
 fun NavDestination.toBottomNavigationTab(): BottomNavigationTab {
     return when {
         hasRoute(Screen.Matching::class) -> BottomNavigationTab.Matching
-        hasRoute(Screen.Add::class) -> BottomNavigationTab.Add
+        hasRoute(Screen.Gallery::class) -> BottomNavigationTab.Gallery
         hasRoute(Screen.Home::class) -> BottomNavigationTab.Home
         hasRoute(Screen.Settings::class) -> BottomNavigationTab.Settings
         else -> BottomNavigationTab.Matching
@@ -146,8 +147,8 @@ private fun NavigationHost(
                 }
             )
         }
-        composable<Screen.Add> {
-
+        composable<Screen.Gallery> {
+            GalleryApp()
         }
         composable<Screen.Home> {
 

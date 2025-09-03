@@ -19,9 +19,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.rounded.AccountBox
 import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.PhotoLibrary
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.sp
 import dev.chrisbanes.haze.HazeDefaults
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
-
 
 @Composable
 fun GlassmorphicBottomNavigation(
@@ -105,10 +104,10 @@ fun GlassmorphicBottomNavigation(
                 onClick = { onItemClick(Screen.Matching) },
             )
             BottomNavigationItem(
-                icon = Icons.Filled.Info,
-                label = "Add",
-                selected = currentTab == BottomNavigationTab.Add,
-                onClick = { onItemClick(Screen.Add) },
+                icon = Icons.Rounded.PhotoLibrary,
+                label = "Gallery",
+                selected = currentTab == BottomNavigationTab.Gallery,
+                onClick = { onItemClick(Screen.Gallery) },
             )
             BottomNavigationItem(
                 icon = Icons.Rounded.Home,
@@ -220,7 +219,7 @@ fun BottomNavigationItem(
 
 enum class BottomNavigationTab {
     Matching,
-    Add,
+    Gallery,
     Home,
     Settings,
 }
