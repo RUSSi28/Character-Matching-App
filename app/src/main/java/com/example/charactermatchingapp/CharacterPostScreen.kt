@@ -23,6 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import androidx.activity.compose.rememberLauncherForActivityResult
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -165,7 +167,37 @@ fun CharacterPostScreen() {
 
             // 投稿ボタン
             Button(onClick = {
-                println("投稿: ${name.text}, タグ=$tags, ${description.text}, 画像=$selectedImageUri")
+                if (selectedImageUri != null) {
+                    // 画像あり → Storage にアップロードして Firestore に保存
+                    CharacterPostActivity.uploadCharacterData(
+                        name = name.text,
+                        tags = tags,
+                        description = description.text,
+                        imageUri = selectedImageUri!!,
+                        context = context,
+                        onSuccess = {
+                            Toast.makeText(
+                                LocalContext.current,
+                                "投稿成功！",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        },
+                        onFailure = { e ->
+                            Toast.makeText(
+                                LocalContext.current,
+                                "エラー: ${e.message}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    )
+                } else {
+                    // 画像がない場合は投稿できない
+                    Toast.makeText(
+                        LocalContext.current,
+                        "画像を選択してください",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }) {
                 Text("投稿")
             }
