@@ -13,25 +13,29 @@
       "matchUpdateTypes": [
         "minor",
         "patch"
-      ]
+      ],
+      "schedule": ["before 6am on Monday,Wednesday,Friday"]
     },
     {
       "matchManagers": ["gradle"],
       "matchUpdateTypes": ["major"],
       "groupName": "Major updates",
       "separateMajorMinor": true,
-      "labels": ["dependencies", "major"]
+      "labels": ["dependencies", "major"],
+      "schedule": ["before 6am on Monday"],
     },
     {
       "matchDepTypes": ["dependencies"],
       "matchUpdateTypes": ["patch"],
       "labels": ["security"],
+      "schedule": ["before 6am every day"],
       "prPriority": 1
     },
     {
       "matchPackagePatterns": ["gradle", "com.android.tools.build:gradle"],
       "separateMajorMinor": true,
-      "labels": ["build-system"]
+      "labels": ["build-system"],
+      "schedule": ["before 6am on Monday"],
     }
   ],
   "commitMessageAction": "update",
