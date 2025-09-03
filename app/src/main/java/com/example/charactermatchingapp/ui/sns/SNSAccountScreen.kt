@@ -1,5 +1,6 @@
 package com.example.charactermatchingapp.ui.sns
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,17 +23,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -51,42 +55,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import coil.compose.rememberAsyncImagePainter
 import com.example.charactermatchingapp.R
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
+import com.example.charactermatchingapp.domain.matching.model.Post
+import com.example.charactermatchingapp.domain.matching.model.Profile
+import kotlinx.coroutines.flow.flowOf
 
-
-// --- データクラスの定義 ---
-data class Profile(
-    val accountName: String,
-    val headerImageResId: Int,
-    val iconImageResId: Int,
-    val profileText: String
-)
-
-data class Post(
-    val id: Int,
-    val userName: String,
-    val userIconResId: Int,
-    val characterName: String,
-    val postImageResId: Int,
-    val posttag1: String,
-    val posttag2: String,
-    val posttag3: String
-) {
-    val postText: String
-        get() = "#$posttag1　#$posttag2　#$posttag3"
-}
 
 // --- UIコンポーネント ---
 @Composable
 fun PostItem(
-    userIconResId: Int,
+    userIconResId: Uri,
     userName: String,
     characterName: String,
     postText: String,
-    postImageResId: Int
+    postImageResId: Uri
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -96,7 +83,11 @@ fun PostItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = userIconResId),
+                painter = if (LocalInspectionMode.current) {
+                    painterResource(id = R.drawable.post_example2)
+                } else {
+                    rememberAsyncImagePainter(model = userIconResId)
+                },
                 contentDescription = "User Icon",
                 modifier = Modifier
                     .size(40.dp)
@@ -111,7 +102,11 @@ fun PostItem(
             )
         }
         Image(
-            painter = painterResource(id = postImageResId),
+            painter = if (LocalInspectionMode.current) {
+                painterResource(id = R.drawable.post_example)
+            } else {
+                rememberAsyncImagePainter(model = postImageResId)
+            },
             contentDescription = "Post Image",
             modifier = Modifier
                 .fillMaxWidth()
@@ -171,7 +166,11 @@ fun ProfileHeader(
         // ヘッダー画像とプロフィール情報
         Box(modifier = Modifier.fillMaxWidth()) {
             Image(
-                painter = painterResource(id = profile.headerImageResId),
+                painter = if (LocalInspectionMode.current) {
+                    painterResource(id = R.drawable.post_example2)
+                } else {
+                    rememberAsyncImagePainter(model = profile.headerImageResId)
+                },
                 contentDescription = "Header Image",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -179,7 +178,11 @@ fun ProfileHeader(
                 contentScale = ContentScale.Crop
             )
             Image(
-                painter = painterResource(id = profile.iconImageResId),
+                painter = if (LocalInspectionMode.current) {
+                    painterResource(id = R.drawable.post_example2)
+                } else {
+                    rememberAsyncImagePainter(model = profile.iconImageResId)
+                },
                 contentDescription = "Icon Image",
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -224,10 +227,13 @@ fun ProfileHeader(
 @Composable
 fun AccountScreen(
     profile: Profile,
-    posts: List<Post>,
+    //posts: LazyPagingItems<Post>,
+    viewModel: SnsViewModel = viewModel(),
     onPostClick: (Post) -> Unit,
     onBackClick: () -> Unit
 ) {
+    val posts: LazyPagingItems<Post> = viewModel.postPagingFlow.collectAsLazyPagingItems()
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.fillMaxSize(),
@@ -240,15 +246,25 @@ fun AccountScreen(
                 HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
             }
         }
-        items(posts) { post ->
-            Image(
-                painter = painterResource(id = post.postImageResId),
-                contentDescription = "Post Image ${post.id}",
-                modifier = Modifier
-                    .aspectRatio(1f)
-                    .clickable { onPostClick(post) },
-                contentScale = ContentScale.Crop
-            )
+        items(
+            count = posts.itemCount,
+            key = { index -> posts[index]?.id ?: index }
+        ) { index ->
+            val post = posts[index]
+            if (post != null) {
+                Image(
+                    painter = if (LocalInspectionMode.current) {
+                        painterResource(id = R.drawable.post_example)
+                    } else {
+                        rememberAsyncImagePainter(model = post.postImageResId)
+                    },
+                    contentDescription = "Post Image ${post.id}",
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .clickable { onPostClick(post) },
+                    contentScale = ContentScale.Crop
+                )
+            }
         }
     }
 }
@@ -256,8 +272,10 @@ fun AccountScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimelineScreen(
-    posts: List<Post>
+    viewModel: SnsViewModel = viewModel()
 ) {
+    val posts: LazyPagingItems<Post> = viewModel.postPagingFlow.collectAsLazyPagingItems()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -283,15 +301,21 @@ fun TimelineScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            items(posts) { post ->
-                PostItem(
-                    userIconResId = post.userIconResId,
-                    userName = post.userName,
-                    characterName = post.characterName,
-                    postText = post.postText,
-                    postImageResId = post.postImageResId
-                )
-                HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+            items(
+                count = posts.itemCount,
+                key = { index -> posts[index]?.id ?: index } // 各アイテムを区別するためのキー
+            ) { index ->
+                val post = posts[index]
+                if (post != null) {
+                    PostItem(
+                        userIconResId = post.userIconResId,
+                        userName = post.userName,
+                        characterName = post.characterName,
+                        postText = post.postText,
+                        postImageResId = post.postImageResId
+                    )
+                    HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                }
             }
         }
     }
@@ -308,13 +332,21 @@ fun EditableProfileHeader(
     Column(modifier = Modifier.fillMaxWidth()) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Image(
-                painter = painterResource(id = profile.headerImageResId),
+                painter = if (LocalInspectionMode.current) {
+                    painterResource(id = R.drawable.post_example2)
+                } else {
+                    rememberAsyncImagePainter(model = profile.headerImageResId)
+                },
                 contentDescription = "Header Image",
                 modifier = Modifier.fillMaxWidth().height(160.dp),
                 contentScale = ContentScale.Crop
             )
             Image(
-                painter = painterResource(id = profile.iconImageResId),
+                painter = if (LocalInspectionMode.current) {
+                    painterResource(id = R.drawable.post_example2)
+                } else {
+                    rememberAsyncImagePainter(model = profile.iconImageResId)
+                },
                 contentDescription = "Icon Image",
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -378,10 +410,13 @@ fun EditableProfileHeader(
 @Composable
 fun PosterViewAccountScreen(
     profile: Profile,
-    posts: List<Post>,
+    viewModel: SnsViewModel = viewModel(),
     onPostClick: (Post) -> Unit,
-    onEditClick: () -> Unit
+    onEditClick: () -> Unit,
+    onPostFabClick: () -> Unit
 ) {
+    val posts = viewModel.postPagingFlow.collectAsLazyPagingItems()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -423,7 +458,19 @@ fun PosterViewAccountScreen(
                 )
             }
         },
-        floatingActionButton = { /* ... */ }
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onPostFabClick,
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "投稿",
+                    tint = Color.White
+                )
+            }
+        }
     ) { paddingValues ->
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
@@ -439,15 +486,25 @@ fun PosterViewAccountScreen(
                     HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
                 }
             }
-            items(posts) { post ->
-                Image(
-                    painter = painterResource(id = post.postImageResId),
-                    contentDescription = "Post Image ${post.id}",
-                    modifier = Modifier
-                        .aspectRatio(1f)
-                        .clickable { onPostClick(post) },
-                    contentScale = ContentScale.Crop
-                )
+            items(
+                count = posts.itemCount,
+                key = { index -> posts[index]?.id ?: index }
+            ) { index ->
+                val post = posts[index]
+                if (post != null) {
+                    Image(
+                        painter = if (LocalInspectionMode.current) {
+                            painterResource(id = R.drawable.post_example)
+                        } else {
+                            rememberAsyncImagePainter(model = post.postImageResId)
+                        },
+                        contentDescription = "Post Image ${post.id}",
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .clickable { onPostClick(post) },
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
         }
     }
@@ -459,8 +516,9 @@ fun PosterViewAccountScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
-    posts: List<Post>
+    viewModel: SnsViewModel = viewModel()
 ) {
+    val posts = viewModel.postPagingFlow.collectAsLazyPagingItems()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -512,15 +570,25 @@ fun FavoritesScreen(
             verticalArrangement = Arrangement.spacedBy(1.dp),
             horizontalArrangement = Arrangement.spacedBy(1.dp)
         ) {
-            items(posts) { post ->
-                Image(
-                    painter = painterResource(id = post.postImageResId),
-                    contentDescription = "Favorite Image ${post.id}",
-                    modifier = Modifier
-                        .aspectRatio(1f)
-                        .clickable { /* TODO: 画像クリック時の遷移処理 */ },
-                    contentScale = ContentScale.Crop
-                )
+            items(
+                count = posts.itemCount,
+                key = { index -> posts[index]?.id ?: index }
+            ) { index ->
+                val post = posts[index]
+                if (post != null) {
+                    Image(
+                        painter = if (LocalInspectionMode.current) {
+                            painterResource(id = R.drawable.post_example2)
+                        } else {
+                            rememberAsyncImagePainter(model = post.postImageResId)
+                        },
+                        contentDescription = "Favorite Image ${post.id}",
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .clickable { /* TODO: 画像クリック時の遷移処理 */ },
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
         }
     }
@@ -532,18 +600,28 @@ fun FavoritesScreen(
 @Preview(showBackground = true, name = "投稿アイテムプレビュー")
 @Composable
 fun PostItemPreview() {
+    val samplePost = Post(
+        id = "1",
+        userName = "User Name",
+        userIconResId = Uri.EMPTY,
+        characterName = "キャラ名",
+        postImageResId = Uri.EMPTY,
+        posttags = listOf("イラスト", "オリジナル", "女の子")
+    )
+
     MaterialTheme(
         colorScheme = lightColorScheme(
             primary = Color(0xFF007AFF),
             background = Color.White
         )
     ) {
+        // ★★★ 作成したオブジェクトのプロパティを渡す ★★★
         PostItem(
-            userIconResId = R.drawable.post_example2,
-            userName = "User Name",
-            characterName = "サンプルキャラA",
-            postText = "#イラスト　#オリジナル　#女の子",
-            postImageResId = R.drawable.post_example
+            userIconResId = samplePost.userIconResId,
+            userName = samplePost.userName,
+            characterName = samplePost.characterName,
+            postText = samplePost.postText, // get()で自動生成されたテキストが使われる
+            postImageResId = samplePost.postImageResId
         )
     }
 }
@@ -554,23 +632,24 @@ fun PostItemPreview() {
 fun AccountScreenPreview() {
     val sampleProfile = Profile(
         accountName = "User Name",
-        headerImageResId = R.drawable.post_example2,
-        iconImageResId = R.drawable.post_example2,
+        headerImageResId = Uri.EMPTY,
+        iconImageResId = Uri.EMPTY,
         profileText = "ここにプロフィール文が入ります。この文章はサンプルです。"
     )
 
-    val samplePosts = List(10) { i ->
+    val samplePosts = List(50) { i ->
         Post(
-            id = i,
+            id = i.toString(),
             userName = sampleProfile.accountName,
             userIconResId = sampleProfile.iconImageResId,
             characterName = "キャラ名 $i",
-            postImageResId = R.drawable.post_example,
-            posttag1 = "タグA$i",
-            posttag2 = "タグB$i",
-            posttag3 = "タグC$i"
+            postImageResId = Uri.EMPTY,
+            posttags = listOf("タグA$i", "タグB$i", "タグC$i")
         )
     }
+
+    val posts: LazyPagingItems<Post> = flowOf(PagingData.from(samplePosts))
+        .collectAsLazyPagingItems()
 
     MaterialTheme(
         colorScheme = lightColorScheme(
@@ -579,64 +658,143 @@ fun AccountScreenPreview() {
 
         )
     ) {
-        AccountScreen(
-            profile = sampleProfile,
-            posts = samplePosts,
-            onPostClick = {},
-            onBackClick = {}
-        )
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(1.dp),
+            horizontalArrangement = Arrangement.spacedBy(1.dp)
+        ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Column {
+                    ProfileHeader(
+                        profile = sampleProfile,
+                        onBackClick = {} // プレビューでは何もしない
+                    )
+                    HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                }
+            }
+            items(
+                count = posts.itemCount,
+                key = { index -> posts[index]?.id ?: index }
+            ) { index ->
+                val post = posts[index]
+                if (post != null) {
+                    Image(
+                        painter = if (LocalInspectionMode.current) {
+                            painterResource(id = R.drawable.post_example)
+                        } else {
+                            rememberAsyncImagePainter(model = post.postImageResId)
+                        },
+                        contentDescription = "Post Image ${post.id}",
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .clickable { },
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+        }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, name = "タイムライン画面プレビュー")
 @Composable
 fun TimelineScreenPreview() {
-    val samplePosts = listOf(
-        Post(
-            id = 1,
-            userName = "User Name",
-            userIconResId = R.drawable.post_example2,
-            characterName = "サンプルキャラA",
-            postImageResId = R.drawable.post_example,
-            posttag1 = "イラスト",
-            posttag2 = "オリジナル",
-            posttag3 = "女の子"
-        ),
-        Post(
-            id = 2,
-            userName = "User Name",
-            userIconResId = R.drawable.post_example2,
-            characterName = "サンプルキャラB",
-            postImageResId = R.drawable.post_example,
-            posttag1 = "風景",
-            posttag2 = "ファンタジー",
-            posttag3 = "背景"
-        ),
+    val sampleProfile = Profile(
+        accountName = "User Name",
+        headerImageResId = Uri.EMPTY,
+        iconImageResId = Uri.EMPTY,
+        profileText = "ここにプロフィール文が入ります。この文章はサンプルです。"
     )
+    val samplePosts = List(50) { i ->
+        Post(
+            id = i.toString(),
+            userName = sampleProfile.accountName,
+            userIconResId = sampleProfile.iconImageResId,
+            characterName = "キャラ名 $i",
+            postImageResId = Uri.EMPTY,
+            posttags = listOf("タグA$i", "タグB$i", "タグC$i")
+        )
+    }
+
+    val posts: LazyPagingItems<Post> = flowOf(PagingData.from(samplePosts))
+        .collectAsLazyPagingItems()
 
     MaterialTheme(
-        colorScheme = lightColorScheme(
-            background = Color.White,
-            primary = Color(0xFF007AFF)
-        )
+        colorScheme = lightColorScheme(background = Color.White, primary = Color(0xFF007AFF))
     ) {
-        TimelineScreen(posts = samplePosts)
+        // ★★★ TimelineScreenの中身を直接ここに記述する ★★★
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("投稿") },
+                    navigationIcon = {
+                        IconButton(onClick = { /* プレビューでは何もしない */ }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "戻る"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = Color.White,
+                        navigationIconContentColor = Color.White
+                    )
+                )
+            }
+        ) { paddingValues ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                items(
+                    count = posts.itemCount,
+                    key = { index -> posts[index]?.id ?: index }
+                ) { index ->
+                    val post = posts[index]
+                    if (post != null) {
+                        PostItem(
+                            userIconResId = post.userIconResId,
+                            userName = post.userName,
+                            characterName = post.characterName,
+                            postText = post.postText,
+                            postImageResId = post.postImageResId
+                        )
+                        HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                    }
+                }
+            }
+        }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, name = "投稿者用アカウント画面プレビュー")
 @Composable
 fun PosterViewAccountScreenPreview() {
     val sampleProfile = Profile(
         accountName = "User Name",
-        headerImageResId = R.drawable.post_example2,
-        iconImageResId = R.drawable.post_example2,
+        headerImageResId = Uri.EMPTY,
+        iconImageResId = Uri.EMPTY,
         profileText = "ここにプロフィール文が入ります。この文章はサンプルです。"
     )
 
-    val samplePosts = List(10) { i ->
-        Post(id = i, userName = sampleProfile.accountName, userIconResId = sampleProfile.iconImageResId, characterName = "キャラ名 $i", postImageResId = R.drawable.post_example, posttag1 = "タグA$i", posttag2 = "タグB$i", posttag3 = "タグC$i")
+    val samplePosts = List(50) { i ->
+        Post(
+            id = i.toString(),
+            userName = sampleProfile.accountName,
+            userIconResId = sampleProfile.iconImageResId,
+            characterName = "キャラ名 $i",
+            postImageResId = Uri.EMPTY,
+            posttags = listOf("タグA$i", "タグB$i", "タグC$i")
+        )
     }
+
+    val posts: LazyPagingItems<Post> = flowOf(PagingData.from(samplePosts))
+        .collectAsLazyPagingItems()
 
     MaterialTheme(
         colorScheme = lightColorScheme(
@@ -644,28 +802,196 @@ fun PosterViewAccountScreenPreview() {
             background = Color.White
         )
     ) {
-        PosterViewAccountScreen(
-            profile = sampleProfile,
-            posts = samplePosts,
-            onPostClick = {},
-            onEditClick = {}
-        )
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("") },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = Color.White
+                    )
+                )
+            },
+            bottomBar = {
+                NavigationBar(
+                    modifier = Modifier.height(52.dp), // 高さを指定
+                    containerColor = MaterialTheme.colorScheme.primary // 背景色を青に
+                ) {
+                    val itemColors = NavigationBarItemDefaults.colors(
+                        indicatorColor = Color.White.copy(alpha = 0.3f), // 選択中アイテムの背景色
+                        selectedIconColor = Color.White,
+                        unselectedIconColor = Color.White.copy(alpha = 0.7f)
+                    )
+
+                    NavigationBarItem(
+                        selected = false,
+                        onClick = { /* TODO */ },
+                        icon = { Text("スワイプ") },
+                        colors = itemColors
+                    )
+                    NavigationBarItem(
+                        selected = false,
+                        onClick = { /* TODO */ },
+                        icon = { Text("お気に入り") },
+                        colors = itemColors
+                    )
+                    NavigationBarItem(
+                        selected = true,
+                        onClick = { /* TODO */ },
+                        icon = { Text("アカウント") },
+                        colors = itemColors
+                    )
+                }
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = {},
+                    shape = CircleShape,
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "投稿",
+                        tint = Color.White
+                    )
+                }
+            }
+        ) { paddingValues ->
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                verticalArrangement = Arrangement.spacedBy(1.dp),
+                horizontalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Column {
+                        EditableProfileHeader(profile = sampleProfile, onEditClick = {})
+                        HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                    }
+                }
+                items(
+                    count = posts.itemCount,
+                    key = { index -> posts[index]?.id ?: index }
+                ) { index ->
+                    val post = posts[index]
+                    if (post != null) {
+                        Image(
+                            painter = if (LocalInspectionMode.current) {
+                                painterResource(id = R.drawable.post_example)
+                            } else {
+                                rememberAsyncImagePainter(model = post.postImageResId)
+                            },
+                            contentDescription = "Post Image ${post.id}",
+                            modifier = Modifier
+                                .aspectRatio(1f)
+                                .clickable { },
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, name = "お気に入り画面プレビュー")
 @Composable
 fun FavoritesScreenPreview() {
-    val samplePosts = List(10) { i ->
-        Post(id = i, userName = "User Name", userIconResId = R.drawable.post_example2, characterName = "キャラ名 $i", postImageResId = R.drawable.post_example, posttag1 = "タグA$i", posttag2 = "タグB$i", posttag3 = "タグC$i")
+    val samplePosts = List(50) { i ->
+        Post(
+            id = i.toString(),
+            userName = "User Name",
+            userIconResId = Uri.EMPTY,
+            characterName = "キャラ名 $i",
+            postImageResId = Uri.EMPTY,
+            posttags = listOf("タグA$i", "タグB$i", "タグC$i")
+        )
     }
 
+    val posts: LazyPagingItems<Post> = flowOf(PagingData.from(samplePosts))
+        .collectAsLazyPagingItems()
+    
     MaterialTheme(
         colorScheme = lightColorScheme(
             primary = Color(0xFF007AFF),
             background = Color.White
         )
     ) {
-        FavoritesScreen(posts = samplePosts)
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("") },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = Color.White
+                    )
+                )
+            },
+            bottomBar = {
+                NavigationBar(
+                    modifier = Modifier.height(52.dp), // 高さを指定
+                    containerColor = MaterialTheme.colorScheme.primary // 背景色を青に
+                ) {
+                    val itemColors = NavigationBarItemDefaults.colors(
+                        indicatorColor = Color.White.copy(alpha = 0.3f),
+                        selectedIconColor = Color.White,
+                        unselectedIconColor = Color.White.copy(alpha = 0.7f)
+                    )
+
+                    NavigationBarItem(
+                        selected = false,
+                        onClick = { /* TODO */ },
+                        icon = { Text("スワイプ") },
+                        colors = itemColors
+                    )
+                    NavigationBarItem(
+                        selected = true,
+                        onClick = { /* TODO */ },
+                        icon = { Text("お気に入り") },
+                        colors = itemColors
+                    )
+                    NavigationBarItem(
+                        selected = false,
+                        onClick = { /* TODO */ },
+                        icon = { Text("アカウント") },
+                        colors = itemColors
+                    )
+                }
+            }
+        ) { paddingValues ->
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentPadding = PaddingValues(top = 52.dp),
+                verticalArrangement = Arrangement.spacedBy(1.dp),
+                horizontalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                items(
+                    count = posts.itemCount,
+                    key = { index -> posts[index]?.id ?: index }
+                ) { index ->
+                    val post = posts[index]
+                    if (post != null) {
+                        Image(
+                            painter = if (LocalInspectionMode.current) {
+                                painterResource(id = R.drawable.post_example2)
+                            } else {
+                                rememberAsyncImagePainter(model = post.postImageResId)
+                            },
+                            contentDescription = "Favorite Image ${post.id}",
+                            modifier = Modifier
+                                .aspectRatio(1f)
+                                .clickable { /* TODO: 画像クリック時の遷移処理 */ },
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+            }
+        }
     }
 }
