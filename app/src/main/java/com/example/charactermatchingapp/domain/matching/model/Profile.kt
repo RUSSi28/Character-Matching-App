@@ -4,9 +4,9 @@ import android.net.Uri
 
 // --- データクラスの定義 ---
 data class Profile(
-    val accountName: String = "",
-    val headerImageResId: Uri = Uri.EMPTY,
-    val iconImageResId: Uri = Uri.EMPTY,
-    val profileText: String = ""
+    val accountName: String,
+    val headerImageResId: Uri,
+    val iconImageResId: Uri,
+    val profileText: String
 )
 

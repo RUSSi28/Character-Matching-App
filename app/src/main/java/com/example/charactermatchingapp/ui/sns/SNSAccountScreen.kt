@@ -227,7 +227,6 @@ fun ProfileHeader(
 @Composable
 fun AccountScreen(
     profile: Profile,
-    //posts: LazyPagingItems<Post>,
     viewModel: SnsViewModel = viewModel(),
     onPostClick: (Post) -> Unit,
     onBackClick: () -> Unit
