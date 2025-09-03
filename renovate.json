@@ -2,5 +2,39 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
-  ]
+  ],
+  "packageRules": [
+    {
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch",
+      "matchPackageNames": [
+        "*"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ]
+    },
+    {
+      "matchManagers": ["gradle"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "Major updates",
+      "separateMajorMinor": true,
+      "labels": ["dependencies", "major"]
+    },
+    {
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["patch"],
+      "labels": ["security"],
+      "prPriority": 1
+    },
+    {
+      "matchPackagePatterns": ["gradle", "com.android.tools.build:gradle"],
+      "separateMajorMinor": true,
+      "labels": ["build-system"]
+    }
+  ],
+  "commitMessageAction": "update",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessagePrefix": "chore(deps):",
 }
