@@ -1,3 +1,4 @@
+/*
 package com.example.charactermatchingapp
 
 import android.net.Uri
@@ -71,3 +72,4 @@ object CharacterPostActivity {
             }
     }
 }
+*/

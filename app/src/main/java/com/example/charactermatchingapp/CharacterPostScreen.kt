@@ -173,35 +173,31 @@ fun CharacterPostScreen() {
 
             // 投稿ボタン
             Button(onClick = {
-                // val currentContext = LocalContext.current // ここでは呼び出さない
+                val summary = """
+        名前: ${name.text}
+        タグ: ${tags.joinToString(", ")}
+        説明: ${description.text}
+        画像: ${selectedImageUri?.toString() ?: "未選択"}
+    """.trimIndent()
+
+                Toast.makeText(
+                    context,
+                    summary,
+                    Toast.LENGTH_LONG
+                ).show()
+
+                /*
                 if (selectedImageUri != null) {
                     CharacterPostActivity.uploadCharacterData(
                         name = name.text,
                         tags = tags,
                         description = description.text,
                         imageUri = selectedImageUri!!,
-                        onSuccess = {
-                            Toast.makeText(
-                                context, // 上で取得したcontextを使用
-                                "投稿成功！",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        },
-                        onFailure = { e ->
-                            Toast.makeText(
-                                context, // 上で取得したcontextを使用
-                                "エラー: ${e.message}",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
+                        onSuccess = { ... },
+                        onFailure = { ... }
                     )
-                } else {
-                    Toast.makeText(
-                        context, // 上で取得したcontextを使用
-                        "画像を選択してください",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
+                */
             }) {
                 Text("投稿")
             }
