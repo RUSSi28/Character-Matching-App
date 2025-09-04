@@ -1,14 +1,14 @@
-package com.example.charactermatchingapp.ui.sns
+package com.example.charactermatchingapp.presentation.sns
 
+import PostRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.charactermatchingapp.domain.matching.model.Post
-import com.google.firebase.firestore.firestore
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.Flow
-import PostRepository
 
 // Hiltのアノテーションを削除
 class SnsViewModel : ViewModel() {
