@@ -43,7 +43,6 @@ class PostPagingSource(
                 val userName = doc.getString("userName") ?: ""
                 val characterName = doc.getString("characterName") ?: ""
                 val charaterText= doc.getString("characterText") ?: ""
-                // Firestore上はStringで保存されているURLをUriに変換
                 val userIconResId = doc.getString("userIconResId")?:""
                 val postImageResId = doc.getString("postImageResId")?:""
                 val posttags = doc.get("posttags") as? List<String> ?: emptyList()

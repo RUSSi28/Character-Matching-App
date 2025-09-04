@@ -419,37 +419,6 @@ fun PosterViewAccountScreen(
                 )
             )
         },
-        bottomBar = {
-            NavigationBar(
-                modifier = Modifier.height(52.dp), // 高さを指定
-                containerColor = MaterialTheme.colorScheme.primary // 背景色を青に
-            ) {
-                val itemColors = NavigationBarItemDefaults.colors(
-                    indicatorColor = Color.White.copy(alpha = 0.3f), // 選択中アイテムの背景色
-                    selectedIconColor = Color.White,
-                    unselectedIconColor = Color.White.copy(alpha = 0.7f)
-                )
-
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { /* TODO */ },
-                    icon = { Text("スワイプ") },
-                    colors = itemColors
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { /* TODO */ },
-                    icon = { Text("お気に入り") },
-                    colors = itemColors
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = { /* TODO */ },
-                    icon = { Text("アカウント") },
-                    colors = itemColors
-                )
-            }
-        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onPostFabClick,
@@ -520,37 +489,6 @@ fun FavoritesScreen(
                     titleContentColor = Color.White
                 )
             )
-        },
-        bottomBar = {
-            NavigationBar(
-                modifier = Modifier.height(52.dp), // 高さを指定
-                containerColor = MaterialTheme.colorScheme.primary // 背景色を青に
-            ) {
-                val itemColors = NavigationBarItemDefaults.colors(
-                    indicatorColor = Color.White.copy(alpha = 0.3f),
-                    selectedIconColor = Color.White,
-                    unselectedIconColor = Color.White.copy(alpha = 0.7f)
-                )
-
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { /* TODO */ },
-                    icon = { Text("スワイプ") },
-                    colors = itemColors
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = { /* TODO */ },
-                    icon = { Text("お気に入り") },
-                    colors = itemColors
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { /* TODO */ },
-                    icon = { Text("アカウント") },
-                    colors = itemColors
-                )
-            }
         }
     ) { paddingValues ->
         LazyVerticalGrid(
@@ -796,37 +734,6 @@ fun PosterViewAccountScreenPreview() {
                     )
                 )
             },
-            bottomBar = {
-                NavigationBar(
-                    modifier = Modifier.height(52.dp), // 高さを指定
-                    containerColor = MaterialTheme.colorScheme.primary // 背景色を青に
-                ) {
-                    val itemColors = NavigationBarItemDefaults.colors(
-                        indicatorColor = Color.White.copy(alpha = 0.3f), // 選択中アイテムの背景色
-                        selectedIconColor = Color.White,
-                        unselectedIconColor = Color.White.copy(alpha = 0.7f)
-                    )
-
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { /* TODO */ },
-                        icon = { Text("スワイプ") },
-                        colors = itemColors
-                    )
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { /* TODO */ },
-                        icon = { Text("お気に入り") },
-                        colors = itemColors
-                    )
-                    NavigationBarItem(
-                        selected = true,
-                        onClick = { /* TODO */ },
-                        icon = { Text("アカウント") },
-                        colors = itemColors
-                    )
-                }
-            },
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {},
@@ -914,37 +821,6 @@ fun FavoritesScreenPreview() {
                         titleContentColor = Color.White
                     )
                 )
-            },
-            bottomBar = {
-                NavigationBar(
-                    modifier = Modifier.height(52.dp), // 高さを指定
-                    containerColor = MaterialTheme.colorScheme.primary // 背景色を青に
-                ) {
-                    val itemColors = NavigationBarItemDefaults.colors(
-                        indicatorColor = Color.White.copy(alpha = 0.3f),
-                        selectedIconColor = Color.White,
-                        unselectedIconColor = Color.White.copy(alpha = 0.7f)
-                    )
-
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { /* TODO */ },
-                        icon = { Text("スワイプ") },
-                        colors = itemColors
-                    )
-                    NavigationBarItem(
-                        selected = true,
-                        onClick = { /* TODO */ },
-                        icon = { Text("お気に入り") },
-                        colors = itemColors
-                    )
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { /* TODO */ },
-                        icon = { Text("アカウント") },
-                        colors = itemColors
-                    )
-                }
             }
         ) { paddingValues ->
             LazyVerticalGrid(
