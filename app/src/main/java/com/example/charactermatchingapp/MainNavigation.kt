@@ -17,7 +17,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
+import com.example.charactermatchingapp.presentation.gallery.GalleryApp
+import com.example.charactermatchingapp.data.gallery.GalleryRepositoryImpl
+import com.example.charactermatchingapp.domain.gallery.repository.GalleryRepository
+import com.example.charactermatchingapp.domain.gallery.usecase.GetGalleryItemsUseCase
+import com.example.charactermatchingapp.presentation.gallery.GalleryViewModel
+import com.example.charactermatchingapp.presentation.gallery.GalleryViewModelFactory
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
@@ -29,7 +36,7 @@ sealed class Screen(val route: String) {
     data object Matching : Screen("matching")
 
     @Serializable
-    data object Add : Screen("add")
+    data object Gallery : Screen("gallery")
 
     @Serializable
     data object Home : Screen("home")
@@ -40,7 +47,7 @@ sealed class Screen(val route: String) {
 
 private val bottomNavigationAllowedScreen = setOf(
     Screen.Matching,
-    Screen.Add,
+    Screen.Gallery,
     Screen.Home,
     Screen.Settings
 )
@@ -48,7 +55,7 @@ private val bottomNavigationAllowedScreen = setOf(
 fun NavDestination.toBottomNavigationTab(): BottomNavigationTab {
     return when {
         hasRoute(Screen.Matching::class) -> BottomNavigationTab.Matching
-        hasRoute(Screen.Add::class) -> BottomNavigationTab.Add
+        hasRoute(Screen.Gallery::class) -> BottomNavigationTab.Gallery
         hasRoute(Screen.Home::class) -> BottomNavigationTab.Home
         hasRoute(Screen.Settings::class) -> BottomNavigationTab.Settings
         else -> BottomNavigationTab.Matching
@@ -146,8 +153,11 @@ private fun NavigationHost(
                 }
             )
         }
-        composable<Screen.Add> {
-
+        composable<Screen.Gallery> {
+            val galleryDatasource: GalleryRepository = GalleryRepositoryImpl()
+            val getGalleryItemsUseCase = GetGalleryItemsUseCase(galleryDatasource)
+            val galleryViewModel: GalleryViewModel = viewModel(factory = GalleryViewModelFactory(getGalleryItemsUseCase))
+            GalleryApp(galleryViewModel = galleryViewModel)
         }
         composable<Screen.Home> {
 
