@@ -49,6 +49,7 @@ fun PosterViewScreenNavHost(
         // アカウント設定画面
         composable(AppDestinations.ACCOUNT_SETTINGS_ROUTE) {
             AccountSettingsScreen(
+                accountId = "NjMe4XK8J4rm9f4ogvEj",
                 onClick = {
                     // 戻る・更新ボタンが押されたら前の画面に戻る
                     navController.navigate(AppDestinations.POSTER_VIEW_ACCOUNT_ROUTE)

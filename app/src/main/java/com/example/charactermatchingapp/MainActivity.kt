@@ -14,7 +14,7 @@ class MainActivity : ComponentActivity() {
             CharacterMatchingAppTheme {
                 MainNavigation()
                 PosterViewScreenNavHost()
-                FavoriteScreenNavHost()
+                //FavoriteScreenNavHost()
             }
         }
     }

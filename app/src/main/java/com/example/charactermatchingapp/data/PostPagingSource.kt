@@ -1,20 +1,13 @@
-import android.net.Uri
-import androidx.core.net.toUri
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.charactermatchingapp.domain.matching.model.Post
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.firestore.FieldPath
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 
+// ★★★ コンストラクタでQueryを受け取るように変更 ★★★
 class PostPagingSource(
-    private val firestore: FirebaseFirestore
+    private val query: Query
 ) : PagingSource<QuerySnapshot, Post>() {
 
     companion object {
@@ -23,10 +16,8 @@ class PostPagingSource(
 
     override suspend fun load(params: LoadParams<QuerySnapshot>): LoadResult<QuerySnapshot, Post> {
         return try {
-            // ★★★ 並び順をタイムスタンプからドキュメントIDの降順に変更 ★★★
-            val baseQuery: Query = firestore.collection("posts")
-                .orderBy(FieldPath.documentId(), Query.Direction.DESCENDING)
-                .limit(PAGE_SIZE)
+            // ★★★ 受け取ったqueryをベースにする ★★★
+            val baseQuery = query.limit(PAGE_SIZE)
 
             val currentPage = params.key ?: baseQuery.get().await()
             val lastVisibleDocument = currentPage.documents.lastOrNull()
@@ -37,26 +28,7 @@ class PostPagingSource(
 
             val nextPage = if (params.key == null) currentPage else nextPageQuery.get().await()
 
-            // ★★★ toObjects()を使わず、手動でPostオブジェクトにマッピング ★★★
-            val posts = nextPage.documents.mapNotNull { doc ->
-                // Firestoreのフィールド名を指定して値を取得
-                val userName = doc.getString("userName") ?: ""
-                val characterName = doc.getString("characterName") ?: ""
-                val charaterText= doc.getString("characterText") ?: ""
-                val userIconResId = doc.getString("userIconResId")?:""
-                val postImageResId = doc.getString("postImageResId")?:""
-                val posttags = doc.get("posttags") as? List<String> ?: emptyList()
-
-                Post(
-                    id = doc.id, // ドキュメントIDをidとして使用
-                    userName = userName,
-                    userIconResId = userIconResId,
-                    characterName = characterName,
-                    characterText = charaterText,
-                    postImageResId = postImageResId,
-                    posttags = posttags
-                )
-            }
+            val posts = nextPage.toObjects(Post::class.java)
 
             LoadResult.Page(
                 data = posts,
@@ -70,18 +42,5 @@ class PostPagingSource(
 
     override fun getRefreshKey(state: PagingState<QuerySnapshot, Post>): QuerySnapshot? {
         return null
-    }
-}
-
-class PostRepository(
-    private val firestore: FirebaseFirestore
-) {
-    fun getPostsPager(): Flow<PagingData<Post>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 20,
-                enablePlaceholders = false
-            ), pagingSourceFactory = { PostPagingSource(firestore) }
-        ).flow
     }
 }
