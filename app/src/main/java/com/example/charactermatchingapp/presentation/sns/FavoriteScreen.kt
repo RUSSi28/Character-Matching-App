@@ -41,7 +41,8 @@ import kotlinx.coroutines.flow.flowOf
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
-    viewModel: SnsViewModel = viewModel()
+    viewModel: SnsViewModel = viewModel(),
+    onPostClick: (Post) -> Unit
 ) {
     val posts = viewModel.postPagingFlow.collectAsLazyPagingItems()
     Scaffold(
@@ -79,7 +80,7 @@ fun FavoritesScreen(
                         contentDescription = "Favorite Image ${post.id}",
                         modifier = Modifier
                             .aspectRatio(1f)
-                            .clickable { /* TODO: 画像クリック時の遷移処理 */ },
+                            .clickable { onPostClick(post) },
                         contentScale = ContentScale.Crop
                     )
                 }

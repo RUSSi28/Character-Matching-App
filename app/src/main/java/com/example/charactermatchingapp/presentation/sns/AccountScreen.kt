@@ -36,7 +36,7 @@ fun AccountScreen(
     profile: Profile,
     viewModel: SnsViewModel = viewModel(),
     onPostClick: (Post) -> Unit,
-    onBackClick: () -> Unit
+    onClick: () -> Unit
 ) {
     val posts: LazyPagingItems<Post> = viewModel.postPagingFlow.collectAsLazyPagingItems()
 
@@ -48,7 +48,7 @@ fun AccountScreen(
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             Column {
-                ProfileHeader(profile = profile, onBackClick = onBackClick)
+                ProfileHeader(profile = profile, onBackClick = onClick)
                 HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
             }
         }
