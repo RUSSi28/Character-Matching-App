@@ -41,6 +41,7 @@ import com.example.charactermatchingapp.domain.matching.model.Post
 import com.example.charactermatchingapp.domain.matching.model.Profile
 import com.example.charactermatchingapp.presentation.sns.SnsViewModel
 import kotlinx.coroutines.flow.flowOf
+import com.example.charactermatchingapp.ui.theme.a
 
 /**
  * 新しいアカウント画面（投稿者用）
@@ -49,7 +50,7 @@ import kotlinx.coroutines.flow.flowOf
 @Composable
 fun PosterViewAccountScreen(
     profile: Profile,
-    viewModel: SnsViewModel = viewModel(),
+    viewModel: SnsViewModel,
     onPostClick: (Post) -> Unit,
     onEditClick: () -> Unit,
     onPostFabClick: () -> Unit
@@ -146,7 +147,7 @@ fun PosterViewAccountScreenPreview() {
 
     MaterialTheme(
         colorScheme = lightColorScheme(
-            primary = Color(0xFF007AFF),
+            primary =  a,
             background = Color.White
         )
     ) {

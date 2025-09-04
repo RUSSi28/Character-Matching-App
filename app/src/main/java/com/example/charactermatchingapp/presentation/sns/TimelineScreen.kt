@@ -32,7 +32,8 @@ import kotlinx.coroutines.flow.flowOf
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimelineScreen(
-    viewModel: SnsViewModel = viewModel()
+    viewModel: SnsViewModel = viewModel(),
+    onClick: () -> Unit
 ) {
     val posts: LazyPagingItems<Post> = viewModel.postPagingFlow.collectAsLazyPagingItems()
 
@@ -41,7 +42,7 @@ fun TimelineScreen(
             TopAppBar(
                 title = { Text("投稿") },
                 navigationIcon = {
-                    IconButton(onClick = { /* TODO: 戻る処理 */ }) {
+                    IconButton(onClick = onClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "戻る"

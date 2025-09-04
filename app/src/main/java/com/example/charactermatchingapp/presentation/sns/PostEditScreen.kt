@@ -21,7 +21,9 @@ import coil.compose.rememberAsyncImagePainter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostCreationScreen() {
+fun PostCreationScreen(
+    onClick: () -> Unit
+) {
     var imageUri by remember { mutableStateOf("") }
     var characterName by remember { mutableStateOf("") }
     var tag1 by remember { mutableStateOf("") }
@@ -34,12 +36,12 @@ fun PostCreationScreen() {
             TopAppBar(
                 title = { /* Textは削除 */ },
                 navigationIcon = {
-                    TextButton(onClick = { /* TODO: 戻る処理 */ }) {
+                    TextButton(onClick = onClick) {
                         Text("戻る")
                     }
                 },
                 actions = {
-                    Button(onClick = { /* TODO: 投稿処理 */ }) {
+                    Button(onClick = onClick) {
                         Text("投稿")
                     }
                 }
@@ -155,6 +157,6 @@ fun PostCreationScreenPreview() {
             background = Color.White
         )
     ) {
-        PostCreationScreen()
+        PostCreationScreen(onClick = {})
     }
 }

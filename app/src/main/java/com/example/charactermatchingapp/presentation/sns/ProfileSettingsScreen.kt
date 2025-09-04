@@ -25,7 +25,9 @@ import com.example.charactermatchingapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountSettingsScreen() {
+fun AccountSettingsScreen(
+    onClick: () -> Unit
+) {
     var headerUrl by remember { mutableStateOf("") }
     var iconUrl by remember { mutableStateOf("") }
     var profileText by remember { mutableStateOf("ここにプロフィール文が入ります。") }
@@ -43,8 +45,8 @@ fun AccountSettingsScreen() {
         topBar = {
             TopAppBar(
                 title = { /* タイトルを削除 */ },
-                navigationIcon = { TextButton(onClick = { /* TODO */ }) { Text("戻る") } },
-                actions = { Button(onClick = { /* TODO */ }) { Text("更新") } }
+                navigationIcon = { TextButton(onClick = onClick) { Text("戻る") } },
+                actions = { Button(onClick = onClick) { Text("更新") } }
             )
         }
     ) { paddingValues ->
@@ -161,6 +163,7 @@ fun AccountSettingsScreenPreview() {
             surface = Color.White
         )
     ) {
-        AccountSettingsScreen()
+        AccountSettingsScreen(
+            onClick = {})
     }
 }

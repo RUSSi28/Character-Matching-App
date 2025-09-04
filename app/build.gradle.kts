@@ -63,6 +63,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation(libs.haze)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
