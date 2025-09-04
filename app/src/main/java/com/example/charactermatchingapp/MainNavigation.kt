@@ -20,7 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
 import com.example.charactermatchingapp.presentation.gallery.GalleryApp
-import com.example.charactermatchingapp.data.gallery.GalleryDatasource
+import com.example.charactermatchingapp.data.gallery.GalleryRepositoryImpl
 import com.example.charactermatchingapp.domain.gallery.repository.GalleryRepository
 import com.example.charactermatchingapp.domain.gallery.usecase.GetGalleryItemsUseCase
 import com.example.charactermatchingapp.presentation.gallery.GalleryViewModel
@@ -154,7 +154,7 @@ private fun NavigationHost(
             )
         }
         composable<Screen.Gallery> {
-            val galleryDatasource: GalleryRepository = GalleryDatasource()
+            val galleryDatasource: GalleryRepository = GalleryRepositoryImpl()
             val getGalleryItemsUseCase = GetGalleryItemsUseCase(galleryDatasource)
             val galleryViewModel: GalleryViewModel = viewModel(factory = GalleryViewModelFactory(getGalleryItemsUseCase))
             GalleryApp(galleryViewModel = galleryViewModel)
