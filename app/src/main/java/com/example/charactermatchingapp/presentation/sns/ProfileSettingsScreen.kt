@@ -28,7 +28,6 @@ import com.example.charactermatchingapp.R
 fun AccountSettingsScreen() {
     var headerUrl by remember { mutableStateOf("") }
     var iconUrl by remember { mutableStateOf("") }
-    var accountName by remember { mutableStateOf("User Name") }
     var profileText by remember { mutableStateOf("ここにプロフィール文が入ります。") }
 
     val headerLauncher = rememberLauncherForActivityResult(
@@ -132,21 +131,6 @@ fun AccountSettingsScreen() {
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // アカウント名
-                Column {
-                    Text(
-                        text = "アカウント名",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    OutlinedTextField(
-                        value = accountName,
-                        onValueChange = { accountName = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 48.dp) // ★★★ 最小の高さを設定 ★★★
-                    )
-                }
                 Column {
                     Text(
                         text = "プロフィール文",
