@@ -17,8 +17,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
 import com.example.charactermatchingapp.presentation.gallery.GalleryApp
+import com.example.charactermatchingapp.data.gallery.GalleryDatasource
+import com.example.charactermatchingapp.domain.gallery.repository.GalleryRepository
+import com.example.charactermatchingapp.domain.gallery.usecase.GetGalleryItemsUseCase
+import com.example.charactermatchingapp.presentation.gallery.GalleryViewModel
+import com.example.charactermatchingapp.presentation.gallery.GalleryViewModelFactory
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
@@ -148,7 +154,10 @@ private fun NavigationHost(
             )
         }
         composable<Screen.Gallery> {
-            GalleryApp()
+            val galleryDatasource: GalleryRepository = GalleryDatasource()
+            val getGalleryItemsUseCase = GetGalleryItemsUseCase(galleryDatasource)
+            val galleryViewModel: GalleryViewModel = viewModel(factory = GalleryViewModelFactory(getGalleryItemsUseCase))
+            GalleryApp(galleryViewModel = galleryViewModel)
         }
         composable<Screen.Home> {
 

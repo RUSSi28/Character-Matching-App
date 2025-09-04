@@ -17,12 +17,13 @@ package com.example.charactermatchingapp.data.gallery
 
 import com.example.charactermatchingapp.R
 import com.example.charactermatchingapp.domain.gallery.model.GalleryItem
+import com.example.charactermatchingapp.domain.gallery.repository.GalleryRepository
 
 /**
  * [GalleryDatasource] generates a list of [GalleryItem]
  */
-class GalleryDatasource() {
-    fun loadGalleryItems(): List<GalleryItem> {
+class GalleryDatasource() : GalleryRepository {
+    override suspend fun getGalleryItems(): List<GalleryItem> {
         return listOf(
             GalleryItem(
                 R.string.affirmation1,

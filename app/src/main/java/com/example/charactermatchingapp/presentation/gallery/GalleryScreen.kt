@@ -31,15 +31,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.charactermatchingapp.R
-import com.example.charactermatchingapp.data.gallery.GalleryDatasource
 import com.example.charactermatchingapp.domain.gallery.model.GalleryItem
 import com.example.charactermatchingapp.ui.theme.CharacterMatchingAppTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 @Composable
-fun GalleryApp(modifier: Modifier = Modifier) {
+fun GalleryApp(modifier: Modifier = Modifier, galleryViewModel: GalleryViewModel = viewModel()) {
+    val galleryItemList by galleryViewModel.galleryItemList.collectAsState()
     GalleryItemList(
-        galleryItemList = GalleryDatasource().loadGalleryItems(),
+        galleryItemList = galleryItemList,
         modifier = modifier
     )
 }
