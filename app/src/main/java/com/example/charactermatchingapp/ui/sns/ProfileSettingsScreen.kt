@@ -27,18 +27,18 @@ import com.example.charactermatchingapp.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountSettingsScreen() {
-    var headerUri by remember { mutableStateOf<Uri?>(null) }
-    var iconUri by remember { mutableStateOf<Uri?>(null) }
+    var headerUrl by remember { mutableStateOf("") }
+    var iconUrl by remember { mutableStateOf("") }
     var accountName by remember { mutableStateOf("User Name") }
     var profileText by remember { mutableStateOf("ここにプロフィール文が入ります。") }
 
     val headerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
-        onResult = { uri -> headerUri = uri }
+        onResult = { }
     )
     val iconLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
-        onResult = { uri -> iconUri = uri }
+        onResult = { }
     )
 
     Scaffold(
@@ -70,7 +70,7 @@ fun AccountSettingsScreen() {
                         .clickable { headerLauncher.launch("image/*") },
                     contentAlignment = Alignment.Center
                 ) {
-                    if (headerUri == null) {
+                    if (headerUrl == null) {
                         Image(
                             painter = painterResource(id = R.drawable.post_example2),
                             contentDescription = "Header Placeholder",
@@ -79,7 +79,7 @@ fun AccountSettingsScreen() {
                         )
                     } else {
                         Image(
-                            painter = rememberAsyncImagePainter(headerUri),
+                            painter = rememberAsyncImagePainter(headerUrl),
                             contentDescription = "Header Image",
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
@@ -107,7 +107,7 @@ fun AccountSettingsScreen() {
                         .clickable { iconLauncher.launch("image/*") },
                     contentAlignment = Alignment.Center
                 ) {
-                    if (iconUri == null) {
+                    if (iconUrl == null) {
                         Image(
                             painter = painterResource(id = R.drawable.post_example2),
                             contentDescription = "Icon Placeholder",
@@ -116,7 +116,7 @@ fun AccountSettingsScreen() {
                         )
                     } else {
                         Image(
-                            painter = rememberAsyncImagePainter(iconUri),
+                            painter = rememberAsyncImagePainter(iconUrl),
                             contentDescription = "Icon Image",
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop

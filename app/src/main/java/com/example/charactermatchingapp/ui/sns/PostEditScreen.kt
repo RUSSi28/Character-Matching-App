@@ -25,18 +25,12 @@ import coil.compose.rememberAsyncImagePainter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostCreationScreen() {
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var imageUri by remember { mutableStateOf("") }
     var characterName by remember { mutableStateOf("") }
     var tag1 by remember { mutableStateOf("") }
     var tag2 by remember { mutableStateOf("") }
     var tag3 by remember { mutableStateOf("") }
 
-
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        imageUri = uri
-    }
 
     Scaffold(
         topBar = {
@@ -69,7 +63,6 @@ fun PostCreationScreen() {
                     .aspectRatio(1f) // 1:1の正方形
                     .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp))
                     .clickable {
-                        galleryLauncher.launch("image/*")
                     }
             ) {
                 if (imageUri == null) {
@@ -81,7 +74,7 @@ fun PostCreationScreen() {
                     )
                 } else {
                     Image(
-                        painter = rememberAsyncImagePainter(imageUri),
+                        painter = rememberAsyncImagePainter(model= imageUri),
                         contentDescription = "Selected Image",
                         modifier = Modifier
                             .fillMaxSize()

@@ -1,6 +1,5 @@
 package com.example.charactermatchingapp.ui.sns
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -69,11 +68,7 @@ import kotlinx.coroutines.flow.flowOf
 // --- UIコンポーネント ---
 @Composable
 fun PostItem(
-    userIconResId: Uri,
-    userName: String,
-    characterName: String,
-    postText: String,
-    postImageResId: Uri
+    post: Post
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -86,7 +81,7 @@ fun PostItem(
                 painter = if (LocalInspectionMode.current) {
                     painterResource(id = R.drawable.post_example2)
                 } else {
-                    rememberAsyncImagePainter(model = userIconResId)
+                    rememberAsyncImagePainter(model = post.userIconResId)
                 },
                 contentDescription = "User Icon",
                 modifier = Modifier
@@ -96,7 +91,7 @@ fun PostItem(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = userName,
+                text = post.userName,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp
             )
@@ -105,7 +100,7 @@ fun PostItem(
             painter = if (LocalInspectionMode.current) {
                 painterResource(id = R.drawable.post_example)
             } else {
-                rememberAsyncImagePainter(model = postImageResId)
+                rememberAsyncImagePainter(model = post.postImageResId)
             },
             contentDescription = "Post Image",
             modifier = Modifier
@@ -118,17 +113,21 @@ fun PostItem(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 12.dp)
         ) {
-            Text(text = characterName, fontSize = 16.sp)
+            Text(text = post.characterName, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(12.dp))
-
+            Text(
+                text = post.characterText,
+                fontSize = 14.sp,
+                lineHeight = 20.sp
+            )
+            Spacer(modifier = Modifier.height(12.dp))
             val textColor = if (LocalInspectionMode.current) {
                 Color(0xFF007AFF)
             } else {
                 Color.Unspecified
             }
-
             Text(
-                text = postText,
+                text = post.postText,
                 fontSize = 14.sp,
                 lineHeight = 22.sp,
                 color = textColor
@@ -306,13 +305,7 @@ fun TimelineScreen(
             ) { index ->
                 val post = posts[index]
                 if (post != null) {
-                    PostItem(
-                        userIconResId = post.userIconResId,
-                        userName = post.userName,
-                        characterName = post.characterName,
-                        postText = post.postText,
-                        postImageResId = post.postImageResId
-                    )
+                    PostItem(post)
                     HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
                 }
             }
@@ -602,9 +595,10 @@ fun PostItemPreview() {
     val samplePost = Post(
         id = "1",
         userName = "User Name",
-        userIconResId = Uri.EMPTY,
+        userIconResId = "",
         characterName = "キャラ名",
-        postImageResId = Uri.EMPTY,
+        characterText = "キャラテキスト",
+        postImageResId = "",
         posttags = listOf("イラスト", "オリジナル", "女の子")
     )
 
@@ -615,13 +609,7 @@ fun PostItemPreview() {
         )
     ) {
         // ★★★ 作成したオブジェクトのプロパティを渡す ★★★
-        PostItem(
-            userIconResId = samplePost.userIconResId,
-            userName = samplePost.userName,
-            characterName = samplePost.characterName,
-            postText = samplePost.postText, // get()で自動生成されたテキストが使われる
-            postImageResId = samplePost.postImageResId
-        )
+        PostItem(post= samplePost)
     }
 }
 
@@ -631,8 +619,8 @@ fun PostItemPreview() {
 fun AccountScreenPreview() {
     val sampleProfile = Profile(
         accountName = "User Name",
-        headerImageResId = Uri.EMPTY,
-        iconImageResId = Uri.EMPTY,
+        headerImageResId = "",
+        iconImageResId = "",
         profileText = "ここにプロフィール文が入ります。この文章はサンプルです。"
     )
 
@@ -642,7 +630,8 @@ fun AccountScreenPreview() {
             userName = sampleProfile.accountName,
             userIconResId = sampleProfile.iconImageResId,
             characterName = "キャラ名 $i",
-            postImageResId = Uri.EMPTY,
+            characterText = "キャラテキスト$i",
+            postImageResId = "",
             posttags = listOf("タグA$i", "タグB$i", "タグC$i")
         )
     }
@@ -702,8 +691,8 @@ fun AccountScreenPreview() {
 fun TimelineScreenPreview() {
     val sampleProfile = Profile(
         accountName = "User Name",
-        headerImageResId = Uri.EMPTY,
-        iconImageResId = Uri.EMPTY,
+        headerImageResId = "",
+        iconImageResId = "",
         profileText = "ここにプロフィール文が入ります。この文章はサンプルです。"
     )
     val samplePosts = List(50) { i ->
@@ -712,7 +701,8 @@ fun TimelineScreenPreview() {
             userName = sampleProfile.accountName,
             userIconResId = sampleProfile.iconImageResId,
             characterName = "キャラ名 $i",
-            postImageResId = Uri.EMPTY,
+            characterText = "キャラテキスト$i",
+            postImageResId = "",
             posttags = listOf("タグA$i", "タグB$i", "タグC$i")
         )
     }
@@ -755,13 +745,7 @@ fun TimelineScreenPreview() {
                 ) { index ->
                     val post = posts[index]
                     if (post != null) {
-                        PostItem(
-                            userIconResId = post.userIconResId,
-                            userName = post.userName,
-                            characterName = post.characterName,
-                            postText = post.postText,
-                            postImageResId = post.postImageResId
-                        )
+                        PostItem(post)
                         HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
                     }
                 }
@@ -776,8 +760,8 @@ fun TimelineScreenPreview() {
 fun PosterViewAccountScreenPreview() {
     val sampleProfile = Profile(
         accountName = "User Name",
-        headerImageResId = Uri.EMPTY,
-        iconImageResId = Uri.EMPTY,
+        headerImageResId = "",
+        iconImageResId = "",
         profileText = "ここにプロフィール文が入ります。この文章はサンプルです。"
     )
 
@@ -787,7 +771,8 @@ fun PosterViewAccountScreenPreview() {
             userName = sampleProfile.accountName,
             userIconResId = sampleProfile.iconImageResId,
             characterName = "キャラ名 $i",
-            postImageResId = Uri.EMPTY,
+            characterText = "キャラテキスト$i",
+            postImageResId = "",
             posttags = listOf("タグA$i", "タグB$i", "タグC$i")
         )
     }
@@ -903,9 +888,10 @@ fun FavoritesScreenPreview() {
         Post(
             id = i.toString(),
             userName = "User Name",
-            userIconResId = Uri.EMPTY,
+            userIconResId = "",
             characterName = "キャラ名 $i",
-            postImageResId = Uri.EMPTY,
+            characterText = "キャラテキスト$i",
+            postImageResId = "",
             posttags = listOf("タグA$i", "タグB$i", "タグC$i")
         )
     }

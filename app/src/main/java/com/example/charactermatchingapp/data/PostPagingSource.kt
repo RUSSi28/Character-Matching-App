@@ -42,9 +42,10 @@ class PostPagingSource(
                 // Firestoreのフィールド名を指定して値を取得
                 val userName = doc.getString("userName") ?: ""
                 val characterName = doc.getString("characterName") ?: ""
+                val charaterText= doc.getString("characterText") ?: ""
                 // Firestore上はStringで保存されているURLをUriに変換
-                val userIconResId = doc.getString("userIconResId")?.toUri() ?: Uri.EMPTY
-                val postImageResId = doc.getString("postImageResId")?.toUri() ?: Uri.EMPTY
+                val userIconResId = doc.getString("userIconResId")?:""
+                val postImageResId = doc.getString("postImageResId")?:""
                 val posttags = doc.get("posttags") as? List<String> ?: emptyList()
 
                 Post(
@@ -52,6 +53,7 @@ class PostPagingSource(
                     userName = userName,
                     userIconResId = userIconResId,
                     characterName = characterName,
+                    characterText = charaterText,
                     postImageResId = postImageResId,
                     posttags = posttags
                 )

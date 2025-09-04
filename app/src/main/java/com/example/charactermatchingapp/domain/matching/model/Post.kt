@@ -5,9 +5,10 @@ import android.net.Uri
 data class Post(
     val id: String,
     val userName: String,
-    val userIconResId: Uri,
+    val userIconResId: String,
     val characterName: String,
-    val postImageResId: Uri,
+    val characterText: String,
+    val postImageResId: String,
     val posttags: List<String>
 ) {
     // postTextは、リストの各要素の先頭に#を付けて結合する形に変更
