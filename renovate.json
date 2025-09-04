@@ -20,7 +20,6 @@
       "matchManagers": ["gradle"],
       "matchUpdateTypes": ["major"],
       "groupName": "Major updates",
-      "separateMajorMinor": true,
       "labels": ["dependencies", "major"],
       "schedule": ["before 6am on Monday"],
     },
