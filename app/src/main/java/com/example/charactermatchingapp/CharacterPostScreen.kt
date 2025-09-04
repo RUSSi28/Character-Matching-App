@@ -45,6 +45,8 @@ fun CharacterPostScreen() {
     var tagInput by remember { mutableStateOf(TextFieldValue("")) }
     var tags by remember { mutableStateOf(listOf<String>()) }
 
+    val context = LocalContext.current // Contextをここで取得
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -167,33 +169,31 @@ fun CharacterPostScreen() {
 
             // 投稿ボタン
             Button(onClick = {
+                // val currentContext = LocalContext.current // ここでは呼び出さない
                 if (selectedImageUri != null) {
-                    // 画像あり → Storage にアップロードして Firestore に保存
                     CharacterPostActivity.uploadCharacterData(
                         name = name.text,
                         tags = tags,
                         description = description.text,
                         imageUri = selectedImageUri!!,
-                        context = context,
                         onSuccess = {
                             Toast.makeText(
-                                LocalContext.current,
+                                context, // 上で取得したcontextを使用
                                 "投稿成功！",
                                 Toast.LENGTH_SHORT
                             ).show()
                         },
                         onFailure = { e ->
                             Toast.makeText(
-                                LocalContext.current,
+                                context, // 上で取得したcontextを使用
                                 "エラー: ${e.message}",
                                 Toast.LENGTH_LONG
                             ).show()
                         }
                     )
                 } else {
-                    // 画像がない場合は投稿できない
                     Toast.makeText(
-                        LocalContext.current,
+                        context, // 上で取得したcontextを使用
                         "画像を選択してください",
                         Toast.LENGTH_SHORT
                     ).show()
