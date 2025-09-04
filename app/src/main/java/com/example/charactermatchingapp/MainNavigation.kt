@@ -29,6 +29,13 @@ import com.example.charactermatchingapp.presentation.matching.CharacterMatchingS
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.Serializable
+import com.example.charactermatchingapp.presentation.auth.AuthViewModel
+import com.example.charactermatchingapp.presentation.auth.LoginScreen
+import com.example.charactermatchingapp.presentation.auth.SignUpScreen
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+
+import android.util.Log
 
 @Serializable
 sealed class Screen(val route: String) {
@@ -43,6 +50,12 @@ sealed class Screen(val route: String) {
 
     @Serializable
     data object Settings : Screen("settings")
+
+    @Serializable
+    data object Login : Screen("login")
+
+    @Serializable
+    data object SignUp : Screen("signup")
 }
 
 private val bottomNavigationAllowedScreen = setOf(
@@ -111,6 +124,11 @@ private fun NavigationHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
+    val authViewModel: AuthViewModel = viewModel()
+    val authUiState by authViewModel.uiState.collectAsState()
+
+    val startDestination = Screen.Login
+
     // TODO(): リモートからデータを読み込めるようにして消す
     val items = remember {
         mutableStateListOf(
@@ -142,9 +160,51 @@ private fun NavigationHost(
     }
     NavHost(
         navController = navController,
-        startDestination = Screen.Matching,
+        startDestination = startDestination,
         modifier = modifier
     ) {
+        composable<Screen.Login> {
+            LaunchedEffect(authUiState.isLoginSuccess) {
+                if (authUiState.isLoginSuccess) {
+                    navController.navigate(Screen.Matching) {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
+                    }
+                    authViewModel.resetAuthStates()
+                }
+            }
+            LoginScreen(
+                uiState = authUiState,
+                onLogin = { email, password ->
+                    authViewModel.login(email, password)
+                },
+                onNavigateToSignUp = {
+                    navController.navigate(Screen.SignUp)
+                }
+            )
+        }
+        composable<Screen.SignUp> {
+            LaunchedEffect(authUiState.isSignUpSuccess) {
+                if (authUiState.isSignUpSuccess) {
+                    navController.navigate(Screen.Matching) {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
+                    }
+                    authViewModel.resetAuthStates()
+                }
+            }
+            SignUpScreen(
+                uiState = authUiState,
+                onSignUp = { email, password ->
+                    authViewModel.signUp(email, password)
+                },
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login)
+                }
+            )
+        }
         composable<Screen.Matching> {
             CharacterMatchingScreen(
                 items = items.toImmutableList(),
