@@ -64,6 +64,8 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
     implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.insert-koin:koin-android:4.1.1")
+    testImplementation("io.insert-koin:koin-test-junit4:4.1.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
