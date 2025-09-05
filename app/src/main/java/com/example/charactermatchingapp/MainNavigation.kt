@@ -27,6 +27,8 @@ import com.example.charactermatchingapp.domain.auth.repository.AuthRepository
 import com.example.charactermatchingapp.domain.gallery.repository.GalleryRepository
 import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
 import com.example.charactermatchingapp.presentation.auth.AuthViewModel
+import com.example.charactermatchingapp.data.auth.service.CurrentUserProviderImpl
+import com.example.charactermatchingapp.domain.auth.service.CurrentUserProvider
 import com.example.charactermatchingapp.presentation.auth.AuthViewModelFactory
 import com.example.charactermatchingapp.presentation.auth.LoginScreen
 import com.example.charactermatchingapp.presentation.auth.SignUpScreen
@@ -233,8 +235,10 @@ private fun NavigationHost(
             val galleryDatasource: GalleryRepository =
                 GalleryRepositoryImpl(appContainer.firebaseFirestore)
 
+            val currentUserProvider: CurrentUserProvider = CurrentUserProviderImpl(appContainer.firebaseAuth)
+
             val galleryViewModel: GalleryViewModel = viewModel(
-                factory = GalleryViewModelFactory(galleryDatasource, appContainer.firebaseAuth)
+                factory = GalleryViewModelFactory(galleryDatasource, currentUserProvider)
             )
             GalleryApp(galleryViewModel = galleryViewModel)
         }
