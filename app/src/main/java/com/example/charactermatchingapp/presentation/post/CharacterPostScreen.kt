@@ -1,9 +1,9 @@
-package com.example.charactermatchingapp
+package com.example.charactermatchingapp.presentation.post
+
+import com.example.charactermatchingapp.domain.post.model.PostInfo
+import com.example.charactermatchingapp.ui.theme.CharacterMatchingAppTheme
 
 import android.net.Uri
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,6 +18,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.TextFieldValue
@@ -25,13 +26,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import androidx.activity.compose.rememberLauncherForActivityResult
-import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CharacterPostScreen() {
+fun CharacterPostScreen(onPost: (PostInfo) -> Unit) {
     var name by remember { mutableStateOf(TextFieldValue("")) }
     var description by remember { mutableStateOf(TextFieldValue("")) }
 
@@ -47,13 +47,27 @@ fun CharacterPostScreen() {
     var tagInput by remember { mutableStateOf(TextFieldValue("")) }
     var tags by remember { mutableStateOf(listOf<String>()) }
 
-    val context = LocalContext.current // Contextをここで取得
+    val context = LocalContext.current
+
+
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("キャラクター投稿") }
+            val gradientBrush = Brush.verticalGradient(
+                colors = listOf(MaterialTheme.colorScheme.tertiary, Color(0xFF90CAF9))
             )
+
+            Box(
+                modifier = Modifier.background(gradientBrush)
+            ) {
+                TopAppBar(
+                    title = { Text("キャラクター投稿") },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        titleContentColor = Color.White
+                    )
+                )
+            }
         }
     ) { innerPadding ->
         val scrollState = rememberScrollState()
@@ -85,11 +99,15 @@ fun CharacterPostScreen() {
                 }
             }
 
-            Button(onClick = { launcher.launch("image/*") }) {
-                Text("画像をアップロード")
-            }
+            // 画像アップロードボタン（secondary）
+            GradientButton(
+                text = "画像をアップロード",
+                onClick = { launcher.launch("image/*") },
+                baseColor = MaterialTheme.colorScheme.secondary,
+                textColor = MaterialTheme.colorScheme.onSecondary
+            )
 
-            // 名前（自由入力）
+            // 名前
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -111,19 +129,21 @@ fun CharacterPostScreen() {
                     modifier = Modifier.weight(1f),
                     singleLine = true
                 )
-                Button(
+                // 追加ボタン（secondary）
+                GradientButton(
+                    text = "追加",
                     onClick = {
                         if (tagInput.text.isNotBlank() && tags.size < 10) {
                             tags = tags + tagInput.text
                             tagInput = TextFieldValue("") // 入力欄をクリア
                         }
-                    }
-                ) {
-                    Text("追加")
-                }
+                    },
+                    baseColor = MaterialTheme.colorScheme.secondary,
+                    textColor = MaterialTheme.colorScheme.onSecondary
+                )
             }
 
-            // タグ表示（横並び）
+            // タグ表示
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -133,10 +153,7 @@ fun CharacterPostScreen() {
                         shape = RoundedCornerShape(16.dp),
                         color = MaterialTheme.colorScheme.primaryContainer,
                         modifier = Modifier
-                            .clickable {
-                                // タップで削除できるようにする（任意）
-                                tags = tags - tag
-                            }
+                            .clickable { tags = tags - tag }
                     ) {
                         Text(
                             text = tag,
@@ -154,11 +171,11 @@ fun CharacterPostScreen() {
                     color = Color.Gray,
                     modifier = Modifier
                         .padding(top = 4.dp)
-                        .align(Alignment.Start) // 左寄せ
+                        .align(Alignment.Start)
                 )
             }
 
-            // 説明（自由入力・改行可）
+            // 説明（自由入力）
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
@@ -171,36 +188,21 @@ fun CharacterPostScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 投稿ボタン
-            Button(onClick = {
-                val summary = """
-        名前: ${name.text}
-        タグ: ${tags.joinToString(", ")}
-        説明: ${description.text}
-        画像: ${selectedImageUri?.toString() ?: "未選択"}
-    """.trimIndent()
-
-                Toast.makeText(
-                    context,
-                    summary,
-                    Toast.LENGTH_LONG
-                ).show()
-
-                /*
-                if (selectedImageUri != null) {
-                    CharacterPostActivity.uploadCharacterData(
+            // 投稿ボタン（primary）
+            GradientButton(
+                text = "投稿",
+                onClick = {
+                    val postInfo = PostInfo(
                         name = name.text,
                         tags = tags,
                         description = description.text,
-                        imageUri = selectedImageUri!!,
-                        onSuccess = { ... },
-                        onFailure = { ... }
+                        imageUri = selectedImageUri
                     )
-                }
-                */
-            }) {
-                Text("投稿")
-            }
+                    onPost(postInfo)
+                },
+                baseColor = MaterialTheme.colorScheme.primary,
+                textColor = MaterialTheme.colorScheme.onPrimary
+            )
         }
     }
 }
@@ -208,5 +210,35 @@ fun CharacterPostScreen() {
 @Preview(showBackground = true)
 @Composable
 fun CharacterPostScreenPreview() {
-    CharacterPostScreen()
+    CharacterMatchingAppTheme {
+        CharacterPostScreen(onPost = {})
+    }
 }
+
+@Composable
+fun GradientButton(
+    text: String,
+    onClick: () -> Unit,
+    baseColor: Color,
+    textColor: Color,
+    modifier: Modifier = Modifier
+) {
+
+    val gradientBrush = Brush.verticalGradient(
+        colors = listOf(
+            baseColor,
+            baseColor.copy(alpha = 0.8f)
+        )
+    )
+
+    Box(
+        modifier = modifier
+            .background(gradientBrush, shape = MaterialTheme.shapes.medium)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text, color = textColor)
+    }
+}
+

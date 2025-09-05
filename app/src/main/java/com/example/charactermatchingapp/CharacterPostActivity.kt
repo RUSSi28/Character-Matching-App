@@ -46,9 +46,8 @@ object CharacterPostActivity {
         name: String,
         tags: List<String>,
         description: String,
-        imageUri: Uri,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
+        imageUri: Uri, // 4つのデータを1つのクラスにまとめて引数に渡す
+
     ) {
         val fileRef = storage.reference.child("images/${System.currentTimeMillis()}.jpg")
 
