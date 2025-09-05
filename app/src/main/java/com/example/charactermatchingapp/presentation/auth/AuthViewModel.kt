@@ -2,14 +2,12 @@ package com.example.charactermatchingapp.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.charactermatchingapp.domain.auth.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.example.charactermatchingapp.domain.auth.repository.AuthRepository
-import com.example.charactermatchingapp.domain.auth.usecase.LoginUseCase
-import com.example.charactermatchingapp.domain.auth.usecase.SignUpUseCase
 
 // Generic UI state holder for Auth screens
 data class AuthUiState(
@@ -21,9 +19,7 @@ data class AuthUiState(
 )
 
 class AuthViewModel(
-    private val authRepository: AuthRepository,
-    private val loginUseCase: LoginUseCase,
-    private val signUpUseCase: SignUpUseCase
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthUiState())
@@ -32,9 +28,10 @@ class AuthViewModel(
     fun signUp(email: String, password: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, signUpError = null, loginError = null) }
-            val result = signUpUseCase(email, password)
+            val result = authRepository.signUp(email, password)
             result.fold(
-                onSuccess = {
+                onSuccess = { uid ->
+                    authRepository.saveUser(uid, email)
                     _uiState.update {
                         it.copy(isLoading = false, isSignUpSuccess = true)
                     }
@@ -51,7 +48,7 @@ class AuthViewModel(
     fun login(email: String, password: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, signUpError = null, loginError = null) }
-            val result = loginUseCase(email, password)
+            val result = authRepository.login(email, password)
             result.fold(
                 onSuccess = {
                     _uiState.update {
@@ -68,7 +65,14 @@ class AuthViewModel(
     }
 
     fun resetAuthStates() {
-        _uiState.update { it.copy(isLoginSuccess = false, isSignUpSuccess = false, loginError = null, signUpError = null) }
+        _uiState.update {
+            it.copy(
+                isLoginSuccess = false,
+                isSignUpSuccess = false,
+                loginError = null,
+                signUpError = null
+            )
+        }
     }
 
     fun isUserLoggedIn(): Boolean {

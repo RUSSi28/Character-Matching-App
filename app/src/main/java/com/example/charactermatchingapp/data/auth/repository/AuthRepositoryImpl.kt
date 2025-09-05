@@ -4,9 +4,6 @@ import com.example.charactermatchingapp.domain.auth.repository.AuthRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
-import com.google.firebase.auth.auth
-import com.google.firebase.firestore.firestore
-import com.google.firebase.Firebase
 
 class AuthRepositoryImpl(
     private val auth: FirebaseAuth,
