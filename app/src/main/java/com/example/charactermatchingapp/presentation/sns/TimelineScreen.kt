@@ -32,6 +32,7 @@ import com.example.charactermatchingapp.data.PostRepository
 import com.example.charactermatchingapp.domain.matching.model.Post
 import com.example.charactermatchingapp.domain.matching.model.Profile
 import kotlinx.coroutines.flow.flowOf
+import androidx.compose.material3.Surface
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,40 +60,44 @@ fun TimelineScreen(
             lazyListState.scrollToItem(initialIndex)
         }
     }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("投稿") },
-                navigationIcon = {
-                    IconButton(onClick = onClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "戻る"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background // テーマで定義された背景色（通常は白）を適用
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("投稿") },
+                    navigationIcon = {
+                        IconButton(onClick = onClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "戻る"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = Color.White,
+                        navigationIconContentColor = Color.White
+                    )
                 )
-            )
-        }
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            state = lazyListState
-        ) {
-            items(
-                count = posts.size,
-                key = { index -> posts[index].id } // 各アイテムを区別するためのキー
-            ) { index ->
-                val post = posts[index]
-                PostItemScreen(post)
-                HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+            }
+        ) { paddingValues ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                state = lazyListState
+            ) {
+                items(
+                    count = posts.size,
+                    key = { index -> posts[index].id } // 各アイテムを区別するためのキー
+                ) { index ->
+                    val post = posts[index]
+                    PostItemScreen(post)
+                    HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                }
             }
         }
     }

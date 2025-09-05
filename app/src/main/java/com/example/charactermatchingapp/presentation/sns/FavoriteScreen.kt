@@ -35,7 +35,7 @@ import com.example.charactermatchingapp.R
 import com.example.charactermatchingapp.domain.matching.model.Post
 import kotlinx.coroutines.flow.flowOf
 import com.example.charactermatchingapp.data.PostRepository
-
+import androidx.compose.material3.Surface
 
 /**
  * お気に入り画面
@@ -53,43 +53,48 @@ fun FavoritesScreen(
         )
     )
     val posts by viewModel.favoritesState.collectAsState()
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background // テーマで定義された背景色（通常は白）を適用
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("") },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = Color.White
+                    )
                 )
-            )
-        }
-    ) { paddingValues ->
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(top = 52.dp),
-            verticalArrangement = Arrangement.spacedBy(1.dp),
-            horizontalArrangement = Arrangement.spacedBy(1.dp)
-        ) {
-            items(
-                count = posts.size,
-                key = { index -> posts[index].id }
-            ) { index ->
-                val post = posts[index]
-                Image(
-                    painter = if (LocalInspectionMode.current) {
-                        painterResource(id = R.drawable.post_example2)
-                    } else {
-                        rememberAsyncImagePainter(model = post.postImageResId)
-                    },
-                    contentDescription = "Favorite Image ${post.id}",
-                    modifier = Modifier
-                        .aspectRatio(1f)
-                        .clickable { onPostClick(post) },
-                    contentScale = ContentScale.Crop
-                )
+            }
+        ) { paddingValues ->
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentPadding = PaddingValues(top = 52.dp),
+                verticalArrangement = Arrangement.spacedBy(1.dp),
+                horizontalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                items(
+                    count = posts.size,
+                    key = { index -> posts[index].id }
+                ) { index ->
+                    val post = posts[index]
+                    Image(
+                        painter = if (LocalInspectionMode.current) {
+                            painterResource(id = R.drawable.post_example2)
+                        } else {
+                            rememberAsyncImagePainter(model = post.postImageResId)
+                        },
+                        contentDescription = "Favorite Image ${post.id}",
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .clickable { onPostClick(post) },
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
         }
     }

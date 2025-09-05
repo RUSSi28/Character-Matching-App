@@ -19,11 +19,14 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -39,14 +42,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.charactermatchingapp.R
 import com.example.charactermatchingapp.domain.matching.model.Post
 import com.example.charactermatchingapp.domain.matching.model.Profile
-import com.example.charactermatchingapp.presentation.sns.SnsViewModel
 import kotlinx.coroutines.flow.flowOf
-import com.example.charactermatchingapp.ui.theme.a
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import com.example.charactermatchingapp.data.PostRepository
-import com.example.charactermatchingapp.data.ProfileRepository
-import androidx.compose.runtime.remember
 
 /**
  * 新しいアカウント画面（投稿者用）
@@ -67,63 +63,67 @@ fun PosterViewAccountScreen(
     // ViewModelからプロフィールと投稿リストの状態を監視
     val profile by viewModel.profileState.collectAsState()
     val posts by viewModel.postsState.collectAsState()
-    // プロフィールがnullでない（読み込み完了後）場合にUIを表示
-    profile?.let {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("") },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = Color.White
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background // テーマで定義された背景色（通常は白）を適用
+    ){
+        // プロフィールがnullでない（読み込み完了後）場合にUIを表示
+        profile?.let {
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = { Text("") },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            titleContentColor = Color.White
+                        )
                     )
-                )
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = onPostFabClick,
-                    shape = CircleShape,
-                    containerColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "投稿",
-                        tint = Color.White
-                    )
-                }
-            }
-        ) { paddingValues ->
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                verticalArrangement = Arrangement.spacedBy(1.dp),
-                horizontalArrangement = Arrangement.spacedBy(1.dp)
-            ) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Column {
-                        EditableProfileHeader(profile = it, onEditClick = onEditClick)
-                        HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                },
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = onPostFabClick,
+                        shape = CircleShape,
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "投稿",
+                            tint = Color.White
+                        )
                     }
                 }
-                items(
-                    count = posts.size,
-                    key = { index -> posts[index].id }
-                ) { index ->
-                    val post = posts[index]
-                    Image(
-                        painter = if (LocalInspectionMode.current) {
-                            painterResource(id = R.drawable.post_example)
-                        } else {
-                            rememberAsyncImagePainter(model = post.postImageResId)
-                        },
-                        contentDescription = "Post Image ${post.id}",
-                        modifier = Modifier
-                            .aspectRatio(1f)
-                            .clickable { onPostClick(post) },
-                        contentScale = ContentScale.Crop
-                    )
+            ) { paddingValues ->
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    verticalArrangement = Arrangement.spacedBy(1.dp),
+                    horizontalArrangement = Arrangement.spacedBy(1.dp)
+                ) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        Column {
+                            EditableProfileHeader(profile = it, onEditClick = onEditClick)
+                        }
+                    }
+                    items(
+                        count = posts.size,
+                        key = { index -> posts[index].id }
+                    ) { index ->
+                        val post = posts[index]
+                        Image(
+                            painter = if (LocalInspectionMode.current) {
+                                painterResource(id = R.drawable.post_example)
+                            } else {
+                                rememberAsyncImagePainter(model = post.postImageResId)
+                            },
+                            contentDescription = "Post Image ${post.id}",
+                            modifier = Modifier
+                                .aspectRatio(1f)
+                                .clickable { onPostClick(post) },
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
             }
         }
@@ -158,7 +158,7 @@ fun PosterViewAccountScreenPreview() {
 
     MaterialTheme(
         colorScheme = lightColorScheme(
-            primary =  a,
+            primary =  Color(0xFF007AFF),
             background = Color.White
         )
     ) {

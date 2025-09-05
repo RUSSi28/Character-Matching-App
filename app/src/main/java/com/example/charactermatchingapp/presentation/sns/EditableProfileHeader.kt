@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.charactermatchingapp.R
 import com.example.charactermatchingapp.domain.matching.model.Profile
+import androidx.compose.material3.MaterialTheme
 
 /**
  * 「編集」ボタン付きのプロフィールヘッダー
@@ -64,7 +65,7 @@ fun EditableProfileHeader(
                     .size(80.dp)
                     .background(Color.White, CircleShape)
                     .clip(CircleShape)
-                    .border(2.dp, Color.White, CircleShape),
+                    .border(1.dp, MaterialTheme.colorScheme.background, CircleShape),
                 contentScale = ContentScale.Crop
             )
         }

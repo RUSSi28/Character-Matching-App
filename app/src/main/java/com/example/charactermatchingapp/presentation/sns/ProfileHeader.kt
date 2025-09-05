@@ -90,7 +90,7 @@ fun ProfileHeader(
                     .size(80.dp)
                     .background(Color.White, CircleShape)
                     .clip(CircleShape)
-                    .border(2.dp, Color.White, CircleShape),
+                    .border(1.dp, MaterialTheme.colorScheme.background, CircleShape),
                 contentScale = ContentScale.Crop
             )
         }

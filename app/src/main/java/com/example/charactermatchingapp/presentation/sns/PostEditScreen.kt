@@ -30,119 +30,125 @@ fun PostCreationScreen(
     var tag2 by remember { mutableStateOf("") }
     var tag3 by remember { mutableStateOf("") }
 
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { /* Textは削除 */ },
-                navigationIcon = {
-                    TextButton(onClick = onClick) {
-                        Text("戻る")
-                    }
-                },
-                actions = {
-                    Button(onClick = onClick) {
-                        Text("投稿")
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
-            // --- イラスト画像プレビューエリア ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f) // 1:1の正方形
-                    .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp))
-                    .clickable {
-                    }
-            ) {
-                if (imageUri == null) {
-                    Text(
-                        text = "投稿イラスト",
-                        modifier = Modifier.align(Alignment.Center),
-                        color = Color.Gray,
-                        fontSize = 20.sp
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background // テーマで定義された背景色（通常は白）を適用
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { /* Textは削除 */ },
+                    navigationIcon = {
+                        TextButton(onClick = onClick) {
+                            Text("戻る")
+                        }
+                    },
+                    actions = {
+                        Button(onClick = onClick) {
+                            Text("投稿")
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background
                     )
-                } else {
-                    Image(
-                        painter = rememberAsyncImagePainter(model= imageUri),
-                        contentDescription = "Selected Image",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(8.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // --- キャラ名・タグ入力エリア ---
+        ) { paddingValues ->
             Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp) // 各要素間のスペースを調整
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
             ) {
-                // ★★★ ここからレイアウト変更 ★★★
-                // キャラ名
-                Column {
-                    Text(
-                        text = "キャラ名",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    OutlinedTextField(
-                        value = characterName,
-                        onValueChange = { characterName = it },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                // --- イラスト画像プレビューエリア ---
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f) // 1:1の正方形
+                        .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp))
+                        .clickable {
+                        }
+                ) {
+                    if (imageUri == null) {
+                        Text(
+                            text = "投稿イラスト",
+                            modifier = Modifier.align(Alignment.Center),
+                            color = Color.Gray,
+                            fontSize = 20.sp
+                        )
+                    } else {
+                        Image(
+                            painter = rememberAsyncImagePainter(model= imageUri),
+                            contentDescription = "Selected Image",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
-                // タグ1
-                Column {
-                    Text(
-                        text = "タグ1",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    OutlinedTextField(
-                        value = tag1,
-                        onValueChange = { tag1 = it },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // --- キャラ名・タグ入力エリア ---
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp) // 各要素間のスペースを調整
+                ) {
+                    // ★★★ ここからレイアウト変更 ★★★
+                    // キャラ名
+                    Column {
+                        Text(
+                            text = "キャラ名",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        OutlinedTextField(
+                            value = characterName,
+                            onValueChange = { characterName = it },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    // タグ1
+                    Column {
+                        Text(
+                            text = "タグ1",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        OutlinedTextField(
+                            value = tag1,
+                            onValueChange = { tag1 = it },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    // タグ2
+                    Column {
+                        Text(
+                            text = "タグ2",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        OutlinedTextField(
+                            value = tag2,
+                            onValueChange = { tag2 = it },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    // タグ3
+                    Column {
+                        Text(
+                            text = "タグ3",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        OutlinedTextField(
+                            value = tag3,
+                            onValueChange = { tag3 = it },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
-                // タグ2
-                Column {
-                    Text(
-                        text = "タグ2",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    OutlinedTextField(
-                        value = tag2,
-                        onValueChange = { tag2 = it },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-                // タグ3
-                Column {
-                    Text(
-                        text = "タグ3",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    OutlinedTextField(
-                        value = tag3,
-                        onValueChange = { tag3 = it },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-                // ★★★ ここまでレイアウト変更 ★★★
             }
         }
     }

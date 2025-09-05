@@ -30,8 +30,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.charactermatchingapp.R
 import com.example.charactermatchingapp.domain.matching.model.Post
 import com.example.charactermatchingapp.domain.matching.model.Profile
-import com.example.charactermatchingapp.presentation.sns.SnsViewModel
 import kotlinx.coroutines.flow.flowOf
+import androidx.compose.material3.Surface
 
 @Composable
 fun AccountScreen(
@@ -46,37 +46,40 @@ fun AccountScreen(
     val profile by viewModel.profileState.collectAsState()
     val posts by viewModel.postsState.collectAsState()
 
-    profile?.let {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(1.dp),
-            horizontalArrangement = Arrangement.spacedBy(1.dp)
-        ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Column {
-                    ProfileHeader(profile = it, onBackClick = onClick)
-                    HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background // テーマで定義された背景色（通常は白）を適用
+    ){
+        profile?.let {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.fillMaxSize(),            verticalArrangement = Arrangement.spacedBy(1.dp),
+                horizontalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Column {
+                        ProfileHeader(profile = it, onBackClick = onClick)
+                    }
                 }
-            }
-            items(
-                count = posts.size,
-                key = { index -> posts[index]?.id ?: index }
-            ) { index ->
-                val post = posts[index]
-                if (post != null) {
-                    Image(
-                        painter = if (LocalInspectionMode.current) {
-                            painterResource(id = R.drawable.post_example)
-                        } else {
-                            rememberAsyncImagePainter(model = post.postImageResId)
-                        },
-                        contentDescription = "Post Image ${post.id}",
-                        modifier = Modifier
-                            .aspectRatio(1f)
-                            .clickable { onPostClick(post) },
-                        contentScale = ContentScale.Crop
-                    )
+                items(
+                    count = posts.size,
+                    key = { index -> posts[index]?.id ?: index }
+                ) { index ->
+                    val post = posts[index]
+                    if (post != null) {
+                        Image(
+                            painter = if (LocalInspectionMode.current) {
+                                painterResource(id = R.drawable.post_example)
+                            } else {
+                                rememberAsyncImagePainter(model = post.postImageResId)
+                            },
+                            contentDescription = "Post Image ${post.id}",
+                            modifier = Modifier
+                                .aspectRatio(1f)
+                                .clickable { onPostClick(post) },
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
             }
         }
@@ -110,9 +113,8 @@ fun AccountScreenPreview() {
 
     MaterialTheme(
         colorScheme = lightColorScheme(
-            background = Color.White,
-            primary = Color(0xFF007AFF)
-
+            primary = Color(0xFF007AFF),
+            background = Color.White
         )
     ) {
         LazyVerticalGrid(
@@ -127,7 +129,7 @@ fun AccountScreenPreview() {
                         profile = sampleProfile,
                         onBackClick = {} // プレビューでは何もしない
                     )
-                    HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                    //HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
                 }
             }
             items(

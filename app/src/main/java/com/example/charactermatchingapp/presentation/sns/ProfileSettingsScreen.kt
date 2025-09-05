@@ -45,6 +45,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.charactermatchingapp.R
+import androidx.compose.material3.Surface
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TextFieldDefaults
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,107 +74,134 @@ fun AccountSettingsScreen(
         onResult = viewModel::onIconImageSelected // 結果をViewModelに渡す
     )
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { /* ... */ },
-                navigationIcon = { TextButton(onClick = onClick) { Text("戻る") } },
-                actions = {
-                    Button(onClick = {
-                        viewModel.updateProfile(accountId)
-                        onClick()
-                    }) { Text("更新") }
-                }
-            )
-        }
-    ) { paddingValues ->
-        if (uiState.isLoading) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background // テーマで定義された背景色（通常は白）を適用
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { /* ... */ },
+                    navigationIcon = { TextButton(onClick = onClick) { Text("戻る") } },
+                    actions = {
+                        Button(onClick = {
+                            viewModel.updateProfile(accountId)
+                            onClick()
+                        }) { Text("更新") }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    )
+                )
             }
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                // --- ヘッダーとアイコン画像 ---
-                Box(
-                    modifier = Modifier.fillMaxWidth().height(200.dp)
+        ) { paddingValues ->
+            if (uiState.isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .verticalScroll(rememberScrollState())
                 ) {
+                    // --- ヘッダーとアイコン画像 ---
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(160.dp)
-                            .align(Alignment.TopCenter)
-                            .clickable { headerLauncher.launch("image/*") },
-                        contentAlignment = Alignment.Center
+                            .height(200.dp)
                     ) {
-                        if (uiState.headerImageUrl.isEmpty()) {
-                            Image(painter = painterResource(id = R.drawable.post_example2),
-                                contentDescription = "Header Placeholder",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(160.dp)
+                                .align(Alignment.TopCenter)
+                                .clickable { headerLauncher.launch("image/*") },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (uiState.headerImageUrl.isEmpty()) {
+                                Image(painter = painterResource(id = R.drawable.post_example2),
+                                    contentDescription = "Header Placeholder",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
                                 )
-                        } else {
-                            Image(painter = rememberAsyncImagePainter(uiState.headerImageUrl),
-                                contentDescription = "Header Image",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
+                            } else {
+                                Image(painter = rememberAsyncImagePainter(uiState.headerImageUrl),
+                                    contentDescription = "Header Image",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
                                 )
+                            }
+                        }
+
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .offset(y = (-40).dp),
+                            thickness = 1.dp,
+                            color = Color.LightGray
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .offset(y = 10.dp) // 下からのオフセットは維持
+                                .size(80.dp)
+                                .clip(CircleShape)
+                                .background(Color.White)
+                                .border(1.dp, MaterialTheme.colorScheme.onBackground, CircleShape)
+                                .clickable { iconLauncher.launch("image/*") },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (uiState.iconImageUrl.isEmpty()) {
+                                Image(painter = painterResource(id = R.drawable.post_example2),
+                                    contentDescription = "Icon Placeholder",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                Image(painter = rememberAsyncImagePainter(uiState.iconImageUrl),
+                                    contentDescription = "Icon Image",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
                         }
                     }
 
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .offset(y = (-40).dp),
-                        thickness = 1.dp,
-                        color = Color.LightGray
-                    )
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                    Box(
+                    // --- アカウント名とプロフィール文 ---
+                    Column(
                         modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .offset(y = 10.dp) // 下からのオフセットは維持
-                            .size(80.dp)
-                            .clip(CircleShape)
-                            .background(Color.White)
-                            .border(1.dp, Color.LightGray, CircleShape)
-                            .clickable { iconLauncher.launch("image/*") },
-                        contentAlignment = Alignment.Center
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        if (uiState.iconImageUrl.isEmpty()) {
-                            Image(painter = painterResource(id = R.drawable.post_example2),
-                                contentDescription = "Icon Placeholder",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
+                        Column {
+                            Text(
+                                text = "プロフィール文",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary
                                 )
-                        } else {
-                            Image(painter = rememberAsyncImagePainter(uiState.iconImageUrl),
-                                contentDescription = "Icon Image",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
+                            OutlinedTextField(
+                                value = uiState.profileText,
+                                onValueChange = viewModel::onProfileTextChange, // ViewModelの関数を呼び出す
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(120.dp),
+                                colors = TextFieldDefaults.colors(
+                                        // フォーカスがない時の文字色
+                                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                        // フォーカスがある時の文字色 (同じ色を指定しても良い)
+                                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                        // 背景色を透明に設定 (OutlinedTextFieldでは一般的)
+                                        unfocusedContainerColor = Color.Transparent,
+                                        focusedContainerColor = Color.Transparent
+                                )
                             )
                         }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // --- アカウント名とプロフィール文 ---
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Column {
-                        Text(text = "プロフィール文", /*...*/)
-                        OutlinedTextField(
-                            value = uiState.profileText,
-                            onValueChange = viewModel::onProfileTextChange, // ViewModelの関数を呼び出す
-                            modifier = Modifier.fillMaxWidth().height(120.dp)
-                        )
                     }
                 }
             }
