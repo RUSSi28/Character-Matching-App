@@ -1,6 +1,5 @@
 package com.example.charactermatchingapp.domain.matching.model
 
-import android.net.Uri
 
 data class Post(
     val id: String,

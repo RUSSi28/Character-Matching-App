@@ -16,6 +16,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,10 +34,13 @@ import kotlinx.coroutines.flow.flowOf
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimelineScreen(
-    viewModel: SnsViewModel = viewModel(),
+    accountId: String,
     onClick: () -> Unit
 ) {
-    val posts: LazyPagingItems<Post> = viewModel.postPagingFlow.collectAsLazyPagingItems()
+    val viewModel: AccountViewModel = viewModel(
+        factory = AccountViewModelFactory(accountId = accountId)
+    )
+    val posts by viewModel.postsState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -63,7 +68,7 @@ fun TimelineScreen(
                 .padding(paddingValues)
         ) {
             items(
-                count = posts.itemCount,
+                count = posts.size,
                 key = { index -> posts[index]?.id ?: index } // 各アイテムを区別するためのキー
             ) { index ->
                 val post = posts[index]

@@ -13,6 +13,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -33,43 +35,49 @@ import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun AccountScreen(
-    profile: Profile,
-    viewModel: SnsViewModel = viewModel(),
+    accountId: String,
     onPostClick: (Post) -> Unit,
     onClick: () -> Unit
 ) {
-    val posts: LazyPagingItems<Post> = viewModel.postPagingFlow.collectAsLazyPagingItems()
+    val viewModel: AccountViewModel = viewModel(
+        factory = AccountViewModelFactory(accountId = accountId)
+    )
+    // ViewModelからプロフィールと投稿リストの状態を監視
+    val profile by viewModel.profileState.collectAsState()
+    val posts by viewModel.postsState.collectAsState()
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(1.dp),
-        horizontalArrangement = Arrangement.spacedBy(1.dp)
-    ) {
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            Column {
-                ProfileHeader(profile = profile, onBackClick = onClick)
-                HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+    profile?.let {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(1.dp),
+            horizontalArrangement = Arrangement.spacedBy(1.dp)
+        ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Column {
+                    ProfileHeader(profile = it, onBackClick = onClick)
+                    HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                }
             }
-        }
-        items(
-            count = posts.itemCount,
-            key = { index -> posts[index]?.id ?: index }
-        ) { index ->
-            val post = posts[index]
-            if (post != null) {
-                Image(
-                    painter = if (LocalInspectionMode.current) {
-                        painterResource(id = R.drawable.post_example)
-                    } else {
-                        rememberAsyncImagePainter(model = post.postImageResId)
-                    },
-                    contentDescription = "Post Image ${post.id}",
-                    modifier = Modifier
-                        .aspectRatio(1f)
-                        .clickable { onPostClick(post) },
-                    contentScale = ContentScale.Crop
-                )
+            items(
+                count = posts.size,
+                key = { index -> posts[index]?.id ?: index }
+            ) { index ->
+                val post = posts[index]
+                if (post != null) {
+                    Image(
+                        painter = if (LocalInspectionMode.current) {
+                            painterResource(id = R.drawable.post_example)
+                        } else {
+                            rememberAsyncImagePainter(model = post.postImageResId)
+                        },
+                        contentDescription = "Post Image ${post.id}",
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .clickable { onPostClick(post) },
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
         }
     }

@@ -16,9 +16,9 @@ class SnsViewModel : ViewModel() {
 
     // ViewModelの内部で、Repositoryに必要なインスタンスを直接生成します。
     private val firestore = Firebase.firestore
-    private val postRepository = PostRepository(firestore)
+    private val postRepository = PostRepository()
 
     // postPagingFlowの定義は変更ありません。
-    val postPagingFlow: Flow<PagingData<Post>> =
-        postRepository.getPostsPager().cachedIn(viewModelScope)
+    //val postPagingFlow: Flow<PagingData<Post>> =
+        //postRepository.getPostsPager().cachedIn(viewModelScope)
 }

@@ -42,6 +42,11 @@ import com.example.charactermatchingapp.domain.matching.model.Profile
 import com.example.charactermatchingapp.presentation.sns.SnsViewModel
 import kotlinx.coroutines.flow.flowOf
 import com.example.charactermatchingapp.ui.theme.a
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.example.charactermatchingapp.data.PostRepository
+import com.example.charactermatchingapp.data.ProfileRepository
+import androidx.compose.runtime.remember
 
 /**
  * 新しいアカウント画面（投稿者用）
@@ -49,58 +54,64 @@ import com.example.charactermatchingapp.ui.theme.a
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PosterViewAccountScreen(
-    profile: Profile,
-    viewModel: SnsViewModel,
+    // ViewModelは画面自身が取得する
+    accountId: String,
     onPostClick: (Post) -> Unit,
     onEditClick: () -> Unit,
     onPostFabClick: () -> Unit
 ) {
-    val posts = viewModel.postPagingFlow.collectAsLazyPagingItems()
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White
+    // ★★★ 作成したFactoryを使ってViewModelを初期化 ★★★
+    val viewModel: AccountViewModel = viewModel(
+        factory = AccountViewModelFactory(accountId = accountId)
+    )
+    // ViewModelからプロフィールと投稿リストの状態を監視
+    val profile by viewModel.profileState.collectAsState()
+    val posts by viewModel.postsState.collectAsState()
+    // プロフィールがnullでない（読み込み完了後）場合にUIを表示
+    profile?.let {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("") },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = Color.White
+                    )
                 )
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onPostFabClick,
-                shape = CircleShape,
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "投稿",
-                    tint = Color.White
-                )
-            }
-        }
-    ) { paddingValues ->
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            verticalArrangement = Arrangement.spacedBy(1.dp),
-            horizontalArrangement = Arrangement.spacedBy(1.dp)
-        ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Column {
-                    EditableProfileHeader(profile = profile, onEditClick = onEditClick)
-                    HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = onPostFabClick,
+                    shape = CircleShape,
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "投稿",
+                        tint = Color.White
+                    )
                 }
             }
-            items(
-                count = posts.itemCount,
-                key = { index -> posts[index]?.id ?: index }
-            ) { index ->
-                val post = posts[index]
-                if (post != null) {
+        ) { paddingValues ->
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                verticalArrangement = Arrangement.spacedBy(1.dp),
+                horizontalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Column {
+                        EditableProfileHeader(profile = it, onEditClick = onEditClick)
+                        HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                    }
+                }
+                items(
+                    count = posts.size,
+                    key = { index -> posts[index].id }
+                ) { index ->
+                    val post = posts[index]
                     Image(
                         painter = if (LocalInspectionMode.current) {
                             painterResource(id = R.drawable.post_example)

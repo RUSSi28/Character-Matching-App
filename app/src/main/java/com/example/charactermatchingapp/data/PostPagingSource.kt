@@ -16,24 +16,18 @@ class PostPagingSource(
 
     override suspend fun load(params: LoadParams<QuerySnapshot>): LoadResult<QuerySnapshot, Post> {
         return try {
-            // ★★★ 受け取ったqueryをベースにする ★★★
-            val baseQuery = query.limit(PAGE_SIZE)
+            val currentPage = params.key ?: query.limit(PAGE_SIZE).get().await()
 
-            val currentPage = params.key ?: baseQuery.get().await()
             val lastVisibleDocument = currentPage.documents.lastOrNull()
 
-            val nextPageQuery = lastVisibleDocument?.let {
-                baseQuery.startAfter(it)
-            } ?: baseQuery
-
-            val nextPage = if (params.key == null) currentPage else nextPageQuery.get().await()
-
-            val posts = nextPage.toObjects(Post::class.java)
+            val posts = currentPage.toObjects(Post::class.java)
 
             LoadResult.Page(
                 data = posts,
                 prevKey = null,
-                nextKey = if (nextPage.isEmpty) null else nextPage
+                nextKey = if (posts.isEmpty()) null else lastVisibleDocument?.let {
+                    query.limit(PAGE_SIZE).startAfter(it).get().await()
+                }
             )
         } catch (e: Exception) {
             LoadResult.Error(e)

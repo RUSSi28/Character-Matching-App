@@ -15,8 +15,7 @@ import com.example.charactermatchingapp.presentation.sns.PostCreationScreen
 
 @Composable
 fun PosterViewScreenNavHost(
-    navController: NavHostController = rememberNavController(),
-    snsViewModel: SnsViewModel = viewModel() // ViewModelを共有
+    navController: NavHostController = rememberNavController()
 ) {
     NavHost(
         navController = navController,
@@ -26,13 +25,7 @@ fun PosterViewScreenNavHost(
         composable(AppDestinations.POSTER_VIEW_ACCOUNT_ROUTE) {
             PosterViewAccountScreen(
                 //ホントはDBから取ってきたのが入る
-                profile = Profile(
-                    accountName = "User Name",
-                    headerImageResId = "",
-                    iconImageResId = "",
-                    profileText = "ここにプロフィール文が入ります。この文章はサンプルです。"
-                ),
-                viewModel = snsViewModel,
+                accountId = "NjMe4XK8J4rm9f4ogvEj",
                 onPostClick = {
                     navController.navigate(AppDestinations.TIMELINE_ROUTE)
                 },
@@ -59,6 +52,7 @@ fun PosterViewScreenNavHost(
         // --- タイムライン画面の定義 ---
         composable(AppDestinations.TIMELINE_ROUTE) {
             TimelineScreen(
+                accountId = "NjMe4XK8J4rm9f4ogvEj",
                 onClick = {
                     // ★★★ 戻るボタンが押されたら、前の画面（アカウント画面）に戻る ★★★
                     navController.navigate(AppDestinations.POSTER_VIEW_ACCOUNT_ROUTE)

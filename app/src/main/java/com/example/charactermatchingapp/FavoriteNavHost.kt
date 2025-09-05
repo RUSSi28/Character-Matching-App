@@ -24,7 +24,6 @@ fun FavoriteScreenNavHost(
         // アカウント画面（投稿者用）
         composable(AppDestinations.FAVORITE_ROUTE) {
             FavoritesScreen(
-                viewModel = snsViewModel,
                 onPostClick = {
                     navController.navigate(AppDestinations.ACCOUNT_ROUTE)
                 }
@@ -33,13 +32,7 @@ fun FavoriteScreenNavHost(
         // アカウント画面
         composable(AppDestinations.ACCOUNT_ROUTE) {
             AccountScreen(
-                profile = Profile(
-                    accountName = "User Name",
-                    headerImageResId = "",
-                    iconImageResId = "",
-                    profileText = "ここにプロフィール文が入ります。この文章はサンプルです。"
-                ),
-                viewModel = snsViewModel,
+                accountId = "NjMe4XK8J4rm9f4ogvEj",
                 onClick = {
                     // ★★★ 戻るボタンが押されたら、前の画面（お気に入り画面）に戻る ★★★
                     navController.navigate(AppDestinations.FAVORITE_ROUTE)
@@ -52,6 +45,7 @@ fun FavoriteScreenNavHost(
         // タイムライン画面
         composable(AppDestinations.TIMELINE_ROUTE) {
             TimelineScreen(
+                accountId = "NjMe4XK8J4rm9f4ogvEj",
                 onClick = {
                     // ★★★ 戻るボタンが押されたら、前の画面（アカウント画面）に戻る ★★★
                     navController.navigate(AppDestinations.ACCOUNT_ROUTE)

@@ -90,7 +90,7 @@ fun PostItemScreen(
             val textColor = if (LocalInspectionMode.current) {
                 Color(0xFF007AFF)
             } else {
-                Color.Unspecified
+                Color(0xFF007AFF)
             }
             Text(
                 text = post.postText,

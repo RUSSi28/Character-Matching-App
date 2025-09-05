@@ -17,6 +17,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -41,10 +43,10 @@ import kotlinx.coroutines.flow.flowOf
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
-    viewModel: SnsViewModel = viewModel(),
+    viewModel: AccountViewModel = viewModel(),
     onPostClick: (Post) -> Unit
 ) {
-    val posts = viewModel.postPagingFlow.collectAsLazyPagingItems()
+    val posts by viewModel.postsState.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -66,7 +68,7 @@ fun FavoritesScreen(
             horizontalArrangement = Arrangement.spacedBy(1.dp)
         ) {
             items(
-                count = posts.itemCount,
+                count = posts.size,
                 key = { index -> posts[index]?.id ?: index }
             ) { index ->
                 val post = posts[index]
