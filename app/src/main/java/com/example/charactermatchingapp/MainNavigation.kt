@@ -153,7 +153,9 @@ private fun NavigationHost(
 
         }
         composable<Screen.Settings> {
-            CharacterPostScreen()
+            CharacterPostScreen(onPost = {
+
+            })
         }
     }
 }
