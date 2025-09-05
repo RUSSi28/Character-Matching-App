@@ -138,15 +138,6 @@ private fun NavigationHost(
 ) {
     val appContainer = (LocalContext.current.applicationContext as MyApplication).appContainer
 
-    val authRepository: AuthRepository = AuthRepositoryImpl(appContainer.firebaseAuth, appContainer.firebaseFirestore)
-    val loginUseCase = LoginUseCase(authRepository)
-    val signUpUseCase = SignUpUseCase(authRepository)
-
-    val authViewModel: AuthViewModel = viewModel(
-        factory = AuthViewModelFactory(authRepository, loginUseCase, signUpUseCase)
-    )
-    val authUiState by authViewModel.uiState.collectAsState()
-
     val startDestination = Screen.Login
 
     // TODO(): リモートからデータを読み込めるようにして消す
@@ -184,6 +175,15 @@ private fun NavigationHost(
         modifier = modifier
     ) {
         composable<Screen.Login> {
+            val authRepository: AuthRepository = AuthRepositoryImpl(appContainer.firebaseAuth, appContainer.firebaseFirestore)
+            val loginUseCase = LoginUseCase(authRepository)
+            val signUpUseCase = SignUpUseCase(authRepository)
+
+            val authViewModel: AuthViewModel = viewModel(
+                factory = AuthViewModelFactory(authRepository, loginUseCase, signUpUseCase)
+            )
+            val authUiState by authViewModel.uiState.collectAsState()
+
             LaunchedEffect(authUiState.isLoginSuccess) {
                 if (authUiState.isLoginSuccess) {
                     navController.navigate(Screen.Matching) {
@@ -205,6 +205,15 @@ private fun NavigationHost(
             )
         }
         composable<Screen.SignUp> {
+            val authRepository: AuthRepository = AuthRepositoryImpl(appContainer.firebaseAuth, appContainer.firebaseFirestore)
+            val loginUseCase = LoginUseCase(authRepository)
+            val signUpUseCase = SignUpUseCase(authRepository)
+
+            val authViewModel: AuthViewModel = viewModel(
+                factory = AuthViewModelFactory(authRepository, loginUseCase, signUpUseCase)
+            )
+            val authUiState by authViewModel.uiState.collectAsState()
+
             LaunchedEffect(authUiState.isSignUpSuccess) {
                 if (authUiState.isSignUpSuccess) {
                     navController.navigate(Screen.Matching) {
