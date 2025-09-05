@@ -1,19 +1,15 @@
 package com.example.charactermatchingapp.presentation.sns
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import com.example.charactermatchingapp.data.PostRepository
+import com.example.charactermatchingapp.data.ProfileRepository
 import com.example.charactermatchingapp.domain.matching.model.Post
 import com.example.charactermatchingapp.domain.matching.model.Profile
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.example.charactermatchingapp.data.PostRepository
-import com.example.charactermatchingapp.data.ProfileRepository
 
 class AccountViewModel(
     private val accountId: String,

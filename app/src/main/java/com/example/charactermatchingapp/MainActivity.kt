@@ -12,9 +12,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CharacterMatchingAppTheme {
-                //MainNavigation()
-                PosterViewScreenNavHost()
-                //FavoriteScreenNavHost()
+                MainNavigation()
             }
         }
     }

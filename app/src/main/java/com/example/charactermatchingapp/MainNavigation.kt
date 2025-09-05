@@ -147,13 +147,13 @@ private fun NavigationHost(
             )
         }
         composable<Screen.Add> {
-
+            FavoriteScreenNavHost("NjMe4XK8J4rm9f4ogvEj")
         }
         composable<Screen.Home> {
 
         }
         composable<Screen.Settings> {
-
+            PosterViewScreenNavHost("NjMe4XK8J4rm9f4ogvEj")
         }
     }
 }

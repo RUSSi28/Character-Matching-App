@@ -33,8 +33,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.rememberAsyncImagePainter
 import com.example.charactermatchingapp.R
 import com.example.charactermatchingapp.domain.matching.model.Post
-import com.example.charactermatchingapp.presentation.sns.SnsViewModel
 import kotlinx.coroutines.flow.flowOf
+import com.example.charactermatchingapp.data.PostRepository
 
 
 /**
@@ -43,10 +43,16 @@ import kotlinx.coroutines.flow.flowOf
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
-    viewModel: AccountViewModel = viewModel(),
+    accountId: String,
     onPostClick: (Post) -> Unit
 ) {
-    val posts by viewModel.postsState.collectAsState()
+    val viewModel: FavoritesViewModel = viewModel(
+        factory = FavoritesViewModelFactory(
+            accountId = accountId,
+            postRepository = PostRepository() // 本来はDI（依存性注入）するのが望ましい
+        )
+    )
+    val posts by viewModel.favoritesState.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -69,23 +75,21 @@ fun FavoritesScreen(
         ) {
             items(
                 count = posts.size,
-                key = { index -> posts[index]?.id ?: index }
+                key = { index -> posts[index].id }
             ) { index ->
                 val post = posts[index]
-                if (post != null) {
-                    Image(
-                        painter = if (LocalInspectionMode.current) {
-                            painterResource(id = R.drawable.post_example2)
-                        } else {
-                            rememberAsyncImagePainter(model = post.postImageResId)
-                        },
-                        contentDescription = "Favorite Image ${post.id}",
-                        modifier = Modifier
-                            .aspectRatio(1f)
-                            .clickable { onPostClick(post) },
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                Image(
+                    painter = if (LocalInspectionMode.current) {
+                        painterResource(id = R.drawable.post_example2)
+                    } else {
+                        rememberAsyncImagePainter(model = post.postImageResId)
+                    },
+                    contentDescription = "Favorite Image ${post.id}",
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .clickable { onPostClick(post) },
+                    contentScale = ContentScale.Crop
+                )
             }
         }
     }
