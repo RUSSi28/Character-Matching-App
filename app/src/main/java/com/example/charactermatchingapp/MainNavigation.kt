@@ -11,8 +11,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -21,24 +19,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.charactermatchingapp.data.auth.repository.AuthRepositoryImpl
-import com.example.charactermatchingapp.data.gallery.repository.GalleryRepositoryImpl
-import com.example.charactermatchingapp.domain.auth.repository.AuthRepository
-import com.example.charactermatchingapp.domain.gallery.repository.GalleryRepository
 import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
 import com.example.charactermatchingapp.presentation.auth.AuthViewModel
-import com.example.charactermatchingapp.data.auth.service.CurrentUserProviderImpl
-import com.example.charactermatchingapp.domain.auth.service.CurrentUserProvider
-import com.example.charactermatchingapp.presentation.auth.AuthViewModelFactory
 import com.example.charactermatchingapp.presentation.auth.LoginScreen
 import com.example.charactermatchingapp.presentation.auth.SignUpScreen
 import com.example.charactermatchingapp.presentation.gallery.GalleryApp
 import com.example.charactermatchingapp.presentation.gallery.GalleryViewModel
-import com.example.charactermatchingapp.presentation.gallery.GalleryViewModelFactory
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.Serializable
+import org.koin.androidx.compose.koinViewModel
 
 @Serializable
 sealed class Screen(val route: String) {
@@ -127,8 +118,6 @@ private fun NavigationHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    val appContainer = (LocalContext.current.applicationContext as MyApplication).appContainer
-
     val startDestination = Screen.Login
 
     // TODO(): リモートからデータを読み込めるようにして消す
@@ -166,12 +155,7 @@ private fun NavigationHost(
         modifier = modifier
     ) {
         composable<Screen.Login> {
-            val authRepository: AuthRepository =
-                AuthRepositoryImpl(appContainer.firebaseAuth, appContainer.firebaseFirestore)
-
-            val authViewModel: AuthViewModel = viewModel(
-                factory = AuthViewModelFactory(authRepository)
-            )
+            val authViewModel: AuthViewModel = koinViewModel()
             val authUiState by authViewModel.uiState.collectAsState()
 
             LaunchedEffect(authUiState.isLoginSuccess) {
@@ -195,12 +179,7 @@ private fun NavigationHost(
             )
         }
         composable<Screen.SignUp> {
-            val authRepository: AuthRepository =
-                AuthRepositoryImpl(appContainer.firebaseAuth, appContainer.firebaseFirestore)
-
-            val authViewModel: AuthViewModel = viewModel(
-                factory = AuthViewModelFactory(authRepository)
-            )
+            val authViewModel: AuthViewModel = koinViewModel()
             val authUiState by authViewModel.uiState.collectAsState()
 
             LaunchedEffect(authUiState.isSignUpSuccess) {
@@ -232,14 +211,7 @@ private fun NavigationHost(
             )
         }
         composable<Screen.Gallery> {
-            val galleryDatasource: GalleryRepository =
-                GalleryRepositoryImpl(appContainer.firebaseFirestore)
-
-            val currentUserProvider: CurrentUserProvider = CurrentUserProviderImpl(appContainer.firebaseAuth)
-
-            val galleryViewModel: GalleryViewModel = viewModel(
-                factory = GalleryViewModelFactory(galleryDatasource, currentUserProvider)
-            )
+            val galleryViewModel: GalleryViewModel = koinViewModel()
             GalleryApp(galleryViewModel = galleryViewModel)
         }
         composable<Screen.Home> {
