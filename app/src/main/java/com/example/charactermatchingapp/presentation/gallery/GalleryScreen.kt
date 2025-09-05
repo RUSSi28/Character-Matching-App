@@ -35,9 +35,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import coil.compose.AsyncImage
 import com.google.firebase.Timestamp
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun GalleryApp(modifier: Modifier = Modifier, galleryViewModel: GalleryViewModel = viewModel()) {
+fun GalleryApp(modifier: Modifier = Modifier, galleryViewModel: GalleryViewModel = koinViewModel()) {
     val galleryItemList by galleryViewModel.galleryItemList.collectAsState()
     GalleryItemList(
         galleryItemList = galleryItemList,
