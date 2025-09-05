@@ -15,15 +15,20 @@
  */
 package com.example.charactermatchingapp.domain.gallery.model
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
+import com.google.firebase.Timestamp
 
 /**
  * [GalleryItem] is the data class to represent the Gallery item text and imageResourceId
  */
 data class GalleryItem(
-    @StringRes val stringResourceId: Int,
-    @DrawableRes val imageResourceId: Int,
-    val author: String,
-    val tags: List<String>
+    val artworkId: String,
+    val authorId: String,
+    val authorName: String,
+    val characterName: String,
+    val characterDescription: String,
+    val imageUrl: String,
+    val thumbUrl: String?,
+    val tags: List<String>,
+    val likeCount: Int,
+    val postedAt: Timestamp
 )

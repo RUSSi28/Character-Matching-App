@@ -4,11 +4,15 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -17,12 +21,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
-import com.example.charactermatchingapp.presentation.gallery.GalleryApp
-import com.example.charactermatchingapp.data.gallery.GalleryRepositoryImpl
+import com.example.charactermatchingapp.data.auth.repository.AuthRepositoryImpl
+import com.example.charactermatchingapp.data.gallery.repository.GalleryRepositoryImpl
+import com.example.charactermatchingapp.domain.auth.repository.AuthRepository
 import com.example.charactermatchingapp.domain.gallery.repository.GalleryRepository
-import com.example.charactermatchingapp.domain.gallery.usecase.GetGalleryItemsUseCase
+import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
+import com.example.charactermatchingapp.presentation.auth.AuthViewModel
+import com.example.charactermatchingapp.data.auth.service.CurrentUserProviderImpl
+import com.example.charactermatchingapp.domain.auth.service.CurrentUserProvider
+import com.example.charactermatchingapp.presentation.auth.AuthViewModelFactory
+import com.example.charactermatchingapp.presentation.auth.LoginScreen
+import com.example.charactermatchingapp.presentation.auth.SignUpScreen
+import com.example.charactermatchingapp.presentation.gallery.GalleryApp
 import com.example.charactermatchingapp.presentation.gallery.GalleryViewModel
 import com.example.charactermatchingapp.presentation.gallery.GalleryViewModelFactory
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
@@ -43,6 +53,12 @@ sealed class Screen(val route: String) {
 
     @Serializable
     data object Settings : Screen("settings")
+
+    @Serializable
+    data object Login : Screen("login")
+
+    @Serializable
+    data object SignUp : Screen("signup")
 }
 
 private val bottomNavigationAllowedScreen = setOf(
@@ -111,6 +127,10 @@ private fun NavigationHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
+    val appContainer = (LocalContext.current.applicationContext as MyApplication).appContainer
+
+    val startDestination = Screen.Login
+
     // TODO(): リモートからデータを読み込めるようにして消す
     val items = remember {
         mutableStateListOf(
@@ -142,9 +162,67 @@ private fun NavigationHost(
     }
     NavHost(
         navController = navController,
-        startDestination = Screen.Matching,
+        startDestination = startDestination,
         modifier = modifier
     ) {
+        composable<Screen.Login> {
+            val authRepository: AuthRepository =
+                AuthRepositoryImpl(appContainer.firebaseAuth, appContainer.firebaseFirestore)
+
+            val authViewModel: AuthViewModel = viewModel(
+                factory = AuthViewModelFactory(authRepository)
+            )
+            val authUiState by authViewModel.uiState.collectAsState()
+
+            LaunchedEffect(authUiState.isLoginSuccess) {
+                if (authUiState.isLoginSuccess) {
+                    navController.navigate(Screen.Matching) {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
+                    }
+                    authViewModel.resetAuthStates()
+                }
+            }
+            LoginScreen(
+                uiState = authUiState,
+                onLogin = { email, password ->
+                    authViewModel.login(email, password)
+                },
+                onNavigateToSignUp = {
+                    navController.navigate(Screen.SignUp)
+                }
+            )
+        }
+        composable<Screen.SignUp> {
+            val authRepository: AuthRepository =
+                AuthRepositoryImpl(appContainer.firebaseAuth, appContainer.firebaseFirestore)
+
+            val authViewModel: AuthViewModel = viewModel(
+                factory = AuthViewModelFactory(authRepository)
+            )
+            val authUiState by authViewModel.uiState.collectAsState()
+
+            LaunchedEffect(authUiState.isSignUpSuccess) {
+                if (authUiState.isSignUpSuccess) {
+                    navController.navigate(Screen.Matching) {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
+                    }
+                    authViewModel.resetAuthStates()
+                }
+            }
+            SignUpScreen(
+                uiState = authUiState,
+                onSignUp = { email, password ->
+                    authViewModel.signUp(email, password)
+                },
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login)
+                }
+            )
+        }
         composable<Screen.Matching> {
             CharacterMatchingScreen(
                 items = items.toImmutableList(),
@@ -154,9 +232,14 @@ private fun NavigationHost(
             )
         }
         composable<Screen.Gallery> {
-            val galleryDatasource: GalleryRepository = GalleryRepositoryImpl()
-            val getGalleryItemsUseCase = GetGalleryItemsUseCase(galleryDatasource)
-            val galleryViewModel: GalleryViewModel = viewModel(factory = GalleryViewModelFactory(getGalleryItemsUseCase))
+            val galleryDatasource: GalleryRepository =
+                GalleryRepositoryImpl(appContainer.firebaseFirestore)
+
+            val currentUserProvider: CurrentUserProvider = CurrentUserProviderImpl(appContainer.firebaseAuth)
+
+            val galleryViewModel: GalleryViewModel = viewModel(
+                factory = GalleryViewModelFactory(galleryDatasource, currentUserProvider)
+            )
             GalleryApp(galleryViewModel = galleryViewModel)
         }
         composable<Screen.Home> {

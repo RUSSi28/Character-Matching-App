@@ -1,6 +1,5 @@
 package com.example.charactermatchingapp.presentation.gallery
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -25,18 +24,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.charactermatchingapp.R
 import com.example.charactermatchingapp.domain.gallery.model.GalleryItem
 import com.example.charactermatchingapp.ui.theme.CharacterMatchingAppTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import coil.compose.AsyncImage
+import com.google.firebase.Timestamp
 
 @Composable
 fun GalleryApp(modifier: Modifier = Modifier, galleryViewModel: GalleryViewModel = viewModel()) {
@@ -78,9 +76,9 @@ fun GalleryItemCard(galleryItem: GalleryItem, modifier: Modifier = Modifier) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(galleryItem.imageResourceId),
-                contentDescription = stringResource(galleryItem.stringResourceId),
+            AsyncImage(
+                model = galleryItem.imageUrl,
+                contentDescription = galleryItem.characterName,
                 modifier = Modifier
                     .size(88.dp)
                     .clip(RoundedCornerShape(8.dp)),
@@ -89,14 +87,14 @@ fun GalleryItemCard(galleryItem: GalleryItem, modifier: Modifier = Modifier) {
             Spacer(Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(galleryItem.stringResourceId),
+                    text = galleryItem.characterName,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = galleryItem.author,
+                    text = galleryItem.authorName,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
@@ -129,10 +127,16 @@ private fun GalleryItemCardPreview() {
     CharacterMatchingAppTheme {
         GalleryItemCard(
             GalleryItem(
-                R.string.affirmation1,
-                R.drawable.image1,
-                "Eleanor Roosevelt",
-                listOf("#courage", "#wisdom", "inspiration", "#motivation", "#leadership")
+                artworkId = "1",
+                authorId = "author1",
+                authorName = "Test Author",
+                characterName = "Test Character",
+                characterDescription = "This is a test character description.",
+                imageUrl = "https://via.placeholder.com/150",
+                thumbUrl = null,
+                tags = listOf("#tag1", "#tag2"),
+                likeCount = 10,
+                postedAt = Timestamp.now()
             )
         )
     }
