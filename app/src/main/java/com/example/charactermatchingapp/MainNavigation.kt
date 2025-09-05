@@ -216,7 +216,7 @@ private fun NavigationHost(
         composable<Screen.Gallery> {
             val galleryDatasource: GalleryRepository = GalleryRepositoryImpl()
             val getGalleryItemsUseCase = GetGalleryItemsUseCase(galleryDatasource)
-            val galleryViewModel: GalleryViewModel = viewModel(factory = GalleryViewModelFactory(getGalleryItemsUseCase))
+            val galleryViewModel: GalleryViewModel = viewModel(factory = GalleryViewModelFactory(getGalleryItemsUseCase, com.google.firebase.auth.FirebaseAuth.getInstance()))
             GalleryApp(galleryViewModel = galleryViewModel)
         }
         composable<Screen.Home> {
