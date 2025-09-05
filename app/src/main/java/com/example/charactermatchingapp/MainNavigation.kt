@@ -20,7 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
 import com.example.charactermatchingapp.presentation.gallery.GalleryApp
-import com.example.charactermatchingapp.data.gallery.GalleryRepositoryImpl
+import com.example.charactermatchingapp.data.gallery.repository.GalleryRepositoryImpl
 import com.example.charactermatchingapp.domain.gallery.repository.GalleryRepository
 import com.example.charactermatchingapp.domain.gallery.usecase.GetGalleryItemsUseCase
 import com.example.charactermatchingapp.presentation.gallery.GalleryViewModel
