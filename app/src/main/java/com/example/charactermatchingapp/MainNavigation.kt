@@ -45,6 +45,7 @@ import com.example.charactermatchingapp.presentation.auth.LoginScreen
 import com.example.charactermatchingapp.presentation.auth.SignUpScreen
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
 
 import android.util.Log
 
@@ -135,7 +136,9 @@ private fun NavigationHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    val authRepository: AuthRepository = AuthRepositoryImpl(Firebase.auth, Firebase.firestore)
+    val appContainer = (LocalContext.current.applicationContext as MyApplication).appContainer
+
+    val authRepository: AuthRepository = AuthRepositoryImpl(appContainer.firebaseAuth, appContainer.firebaseFirestore)
     val loginUseCase = LoginUseCase(authRepository)
     val signUpUseCase = SignUpUseCase(authRepository)
 
@@ -231,8 +234,8 @@ private fun NavigationHost(
             )
         }
         composable<Screen.Gallery> {
-            val galleryDatasource: GalleryRepository = GalleryRepositoryImpl(FirebaseFirestore.getInstance())
-            val getGalleryItemsUseCase = GetGalleryItemsUseCase(galleryDatasource, FirebaseAuth.getInstance())
+            val galleryDatasource: GalleryRepository = GalleryRepositoryImpl(appContainer.firebaseFirestore)
+            val getGalleryItemsUseCase = GetGalleryItemsUseCase(galleryDatasource, appContainer.firebaseAuth)
             val galleryViewModel: GalleryViewModel = viewModel(factory = GalleryViewModelFactory(getGalleryItemsUseCase))
             GalleryApp(galleryViewModel = galleryViewModel)
         }
