@@ -6,13 +6,12 @@ import com.example.charactermatchingapp.domain.gallery.usecase.GetGalleryItemsUs
 import com.google.firebase.auth.FirebaseAuth
 
 class GalleryViewModelFactory(
-    private val getGalleryItemsUseCase: GetGalleryItemsUseCase,
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val getGalleryItemsUseCase: GetGalleryItemsUseCase
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(GalleryViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return GalleryViewModel(getGalleryItemsUseCase, auth) as T
+            return GalleryViewModel(getGalleryItemsUseCase) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

@@ -1,5 +1,8 @@
 package com.example.charactermatchingapp
 
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.FirebaseAuth
+
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -214,9 +217,9 @@ private fun NavigationHost(
             )
         }
         composable<Screen.Gallery> {
-            val galleryDatasource: GalleryRepository = GalleryRepositoryImpl()
-            val getGalleryItemsUseCase = GetGalleryItemsUseCase(galleryDatasource)
-            val galleryViewModel: GalleryViewModel = viewModel(factory = GalleryViewModelFactory(getGalleryItemsUseCase, com.google.firebase.auth.FirebaseAuth.getInstance()))
+            val galleryDatasource: GalleryRepository = GalleryRepositoryImpl(FirebaseFirestore.getInstance())
+            val getGalleryItemsUseCase = GetGalleryItemsUseCase(galleryDatasource, FirebaseAuth.getInstance())
+            val galleryViewModel: GalleryViewModel = viewModel(factory = GalleryViewModelFactory(getGalleryItemsUseCase))
             GalleryApp(galleryViewModel = galleryViewModel)
         }
         composable<Screen.Home> {

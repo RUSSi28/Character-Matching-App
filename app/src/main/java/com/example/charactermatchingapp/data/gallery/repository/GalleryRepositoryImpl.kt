@@ -12,7 +12,7 @@ import kotlinx.coroutines.tasks.await
  * [GalleryRepositoryImpl] fetches a list of [GalleryItem] from Firestore
  */
 class GalleryRepositoryImpl(
-    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val db: FirebaseFirestore
 ) : GalleryRepository {
     override suspend fun getGalleryItems(): List<GalleryItem> {
         return try {

@@ -12,8 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class GalleryViewModel(
-    private val getGalleryItemsUseCase: GetGalleryItemsUseCase,
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val getGalleryItemsUseCase: GetGalleryItemsUseCase
 ) : ViewModel() {
 
     private val _galleryItemList = MutableStateFlow<List<GalleryItem>>(emptyList())
@@ -25,16 +24,8 @@ class GalleryViewModel(
 
     private fun loadGalleryItems() {
         viewModelScope.launch {
-            val currentUserId = auth.currentUser?.uid
-            Log.d("GalleryViewModel", "Current User ID: $currentUserId") // Log currentUserId
-            if (currentUserId != null) {
-                _galleryItemList.value = getGalleryItemsUseCase(currentUserId)
-                Log.d("GalleryViewModel", "Gallery items loaded: ${_galleryItemList.value.size}") // Log size
-            } else {
-                // User not logged in, display empty list or handle error
-                _galleryItemList.value = emptyList()
-                Log.d("GalleryViewModel", "User not logged in, gallery items set to empty.")
-            }
+            _galleryItemList.value = getGalleryItemsUseCase()
+            Log.d("GalleryViewModel", "Gallery items loaded: ${_galleryItemList.value.size}")
         }
     }
 }
