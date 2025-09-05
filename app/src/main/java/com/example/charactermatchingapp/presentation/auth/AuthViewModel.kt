@@ -2,14 +2,14 @@ package com.example.charactermatchingapp.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.charactermatchingapp.data.auth.repository.AuthRepositoryImpl
-import com.example.charactermatchingapp.domain.auth.usecase.LoginUseCase
-import com.example.charactermatchingapp.domain.auth.usecase.SignUpUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.charactermatchingapp.domain.auth.repository.AuthRepository
+import com.example.charactermatchingapp.domain.auth.usecase.LoginUseCase
+import com.example.charactermatchingapp.domain.auth.usecase.SignUpUseCase
 
 // Generic UI state holder for Auth screens
 data class AuthUiState(
@@ -20,11 +20,11 @@ data class AuthUiState(
     val isLoginSuccess: Boolean = false
 )
 
-class AuthViewModel : ViewModel() {
-
-    private val authRepository = AuthRepositoryImpl()
-    private val signUpUseCase = SignUpUseCase(authRepository)
-    private val loginUseCase = LoginUseCase(authRepository)
+class AuthViewModel(
+    private val authRepository: AuthRepository,
+    private val loginUseCase: LoginUseCase,
+    private val signUpUseCase: SignUpUseCase
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()

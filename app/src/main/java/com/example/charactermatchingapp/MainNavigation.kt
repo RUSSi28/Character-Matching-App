@@ -2,6 +2,14 @@ package com.example.charactermatchingapp
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
+import com.example.charactermatchingapp.domain.auth.repository.AuthRepository
+import com.example.charactermatchingapp.data.auth.repository.AuthRepositoryImpl
+import com.example.charactermatchingapp.domain.auth.usecase.LoginUseCase
+import com.example.charactermatchingapp.domain.auth.usecase.SignUpUseCase
+import com.example.charactermatchingapp.presentation.auth.AuthViewModelFactory
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
@@ -127,7 +135,13 @@ private fun NavigationHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    val authViewModel: AuthViewModel = viewModel()
+    val authRepository: AuthRepository = AuthRepositoryImpl(Firebase.auth, Firebase.firestore)
+    val loginUseCase = LoginUseCase(authRepository)
+    val signUpUseCase = SignUpUseCase(authRepository)
+
+    val authViewModel: AuthViewModel = viewModel(
+        factory = AuthViewModelFactory(authRepository, loginUseCase, signUpUseCase)
+    )
     val authUiState by authViewModel.uiState.collectAsState()
 
     val startDestination = Screen.Login

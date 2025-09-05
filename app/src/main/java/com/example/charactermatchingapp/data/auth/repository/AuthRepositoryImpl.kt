@@ -9,8 +9,8 @@ import com.google.firebase.firestore.firestore
 import com.google.firebase.Firebase
 
 class AuthRepositoryImpl(
-    private val auth: FirebaseAuth = Firebase.auth,
-    private val firestore: FirebaseFirestore = Firebase.firestore
+    private val auth: FirebaseAuth,
+    private val firestore: FirebaseFirestore
 ) : AuthRepository {
 
     override suspend fun signUp(email: String, password: String): Result<String> {
