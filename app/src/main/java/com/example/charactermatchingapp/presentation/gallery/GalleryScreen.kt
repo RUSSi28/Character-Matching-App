@@ -8,17 +8,20 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,10 +42,44 @@ import com.google.firebase.Timestamp
 @Composable
 fun GalleryApp(modifier: Modifier = Modifier, galleryViewModel: GalleryViewModel = viewModel()) {
     val galleryItemList by galleryViewModel.galleryItemList.collectAsState()
-    GalleryItemList(
-        galleryItemList = galleryItemList,
-        modifier = modifier
-    )
+    val isLoading by galleryViewModel.isLoading.collectAsState()
+    val hasMoreItems by galleryViewModel.hasMoreItems.collectAsState()
+    val currentPage by galleryViewModel.currentPage.collectAsState()
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        GalleryItemList(
+            galleryItemList = galleryItemList,
+            modifier = Modifier.weight(1f) // Take available space
+        )
+
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(
+                onClick = { galleryViewModel.loadPreviousPage() },
+                enabled = !isLoading && currentPage > 1
+            ) {
+                Text("前へ")
+            }
+            Button(
+                onClick = { galleryViewModel.loadNextPage() },
+                enabled = !isLoading && hasMoreItems
+            ) {
+                Text("次へ")
+            }
+        }
+    }
 }
 
 @Composable
@@ -97,8 +134,7 @@ fun GalleryItemCard(galleryItem: GalleryItem, modifier: Modifier = Modifier) {
                     text = galleryItem.authorName,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
-                )
+                    modifier = Modifier.padding(top = 4.dp, bottom = 8.dp))
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
