@@ -31,7 +31,6 @@ import com.example.charactermatchingapp.presentation.gallery.GalleryViewModel
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
 import com.example.charactermatchingapp.presentation.post.CharacterPostScreen
 import com.example.charactermatchingapp.presentation.post.PostViewModel
-import com.example.charactermatchingapp.presentation.post.PostViewModelFactory
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.Serializable
@@ -226,9 +225,12 @@ private fun NavigationHost(
         composable<Screen.Settings> {
             val postViewModel: PostViewModel = koinViewModel()
 
-            CharacterPostScreen(onPost = { postInfo ->
-                postViewModel.savePost(postInfo)
-            })
+            CharacterPostScreen(
+                modifier = modifier, // Pass the modifier here
+                onPost = { postInfo ->
+                    postViewModel.savePost(postInfo)
+                }
+            )
 
         }
     }

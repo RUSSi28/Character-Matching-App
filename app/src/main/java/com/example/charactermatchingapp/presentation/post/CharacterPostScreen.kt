@@ -35,7 +35,10 @@ import com.google.accompanist.flowlayout.FlowRow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CharacterPostScreen(onPost: (PostInfo) -> Unit) {
+fun CharacterPostScreen(
+    modifier: Modifier = Modifier, // Add this line
+    onPost: (PostInfo) -> Unit
+) {
     var name by remember { mutableStateOf(TextFieldValue("")) }
     var description by remember { mutableStateOf(TextFieldValue("")) }
 
@@ -53,37 +56,15 @@ fun CharacterPostScreen(onPost: (PostInfo) -> Unit) {
 
     val context = LocalContext.current
 
-
-
-    Scaffold(
-        topBar = {
-            val gradientBrush = Brush.verticalGradient(
-                colors = listOf(MaterialTheme.colorScheme.tertiary, Color(0xFF90CAF9))
-            )
-
-            Box(
-                modifier = Modifier.background(gradientBrush)
-            ) {
-                TopAppBar(
-                    title = { Text("キャラクター投稿") },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent,
-                        titleContentColor = Color.White
-                    )
-                )
-            }
-        }
-    ) { innerPadding ->
-        val scrollState = rememberScrollState()
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(16.dp)
-                .fillMaxSize()
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    val scrollState = rememberScrollState()
+    Column(
+        modifier = modifier // Use the passed modifier
+            .padding(16.dp)
+            .fillMaxSize()
+            .verticalScroll(scrollState),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
             // 画像表示
             if (selectedImageUri != null) {
                 Image(
@@ -204,8 +185,8 @@ fun CharacterPostScreen(onPost: (PostInfo) -> Unit) {
                 textColor = MaterialTheme.colorScheme.onPrimary
             )
         }
-    }
-}
+
+        }
 
 @Preview(showBackground = true)
 @Composable
@@ -241,4 +222,3 @@ fun GradientButton(
         Text(text, color = textColor)
     }
 }
-
