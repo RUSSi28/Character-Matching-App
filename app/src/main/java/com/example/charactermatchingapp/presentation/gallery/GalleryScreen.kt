@@ -41,17 +41,17 @@ import com.google.firebase.Timestamp
 
 @Composable
 fun GalleryApp(modifier: Modifier = Modifier, galleryViewModel: GalleryViewModel = viewModel()) {
-    val galleryItemList by galleryViewModel.galleryItemList.collectAsState()
+    val galleryItems by galleryViewModel.galleryItems.collectAsState()
     val isLoading by galleryViewModel.isLoading.collectAsState()
-    val hasMoreItems by galleryViewModel.hasMoreItems.collectAsState()
-    val currentPage by galleryViewModel.currentPage.collectAsState()
+    val canLoadNext by galleryViewModel.canLoadNext.collectAsState()
+    val canLoadPrevious by galleryViewModel.canLoadPrevious.collectAsState()
 
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         GalleryItemList(
-            galleryItemList = galleryItemList,
+            galleryItems = galleryItems,
             modifier = Modifier.weight(1f) // Take available space
         )
 
@@ -68,13 +68,13 @@ fun GalleryApp(modifier: Modifier = Modifier, galleryViewModel: GalleryViewModel
         ) {
             Button(
                 onClick = { galleryViewModel.loadPreviousPage() },
-                enabled = !isLoading && currentPage > 1
+                enabled = canLoadPrevious && !isLoading
             ) {
                 Text("前へ")
             }
             Button(
                 onClick = { galleryViewModel.loadNextPage() },
-                enabled = !isLoading && hasMoreItems
+                enabled = canLoadNext && !isLoading
             ) {
                 Text("次へ")
             }
@@ -84,7 +84,7 @@ fun GalleryApp(modifier: Modifier = Modifier, galleryViewModel: GalleryViewModel
 
 @Composable
 fun GalleryItemList(
-    galleryItemList: List<GalleryItem>,
+    galleryItems: List<GalleryItem>,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -92,7 +92,7 @@ fun GalleryItemList(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(galleryItemList) { galleryItem ->
+        items(galleryItems) { galleryItem ->
             GalleryItemCard(
                 galleryItem = galleryItem,
             )
