@@ -30,12 +30,13 @@ import com.example.charactermatchingapp.R
 @Composable
 fun SignUpScreen(
     uiState: AuthUiState,
-    onSignUp: (String, String) -> Unit,
+    onSignUp: (String, String, String) -> Unit,
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var displayName by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier
@@ -46,6 +47,17 @@ fun SignUpScreen(
     ) {
         Text(stringResource(id = R.string.signup_title), style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(32.dp))
+
+        OutlinedTextField(
+            value = displayName,
+            onValueChange = { displayName = it },
+            label = { Text("アカウント名") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            modifier = Modifier.fillMaxWidth(),
+            isError = uiState.signUpError != null,
+            singleLine = true
+        )
+        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = email,
@@ -72,7 +84,7 @@ fun SignUpScreen(
             CircularProgressIndicator()
         } else {
             Button(
-                onClick = { onSignUp(email, password) },
+                onClick = { onSignUp(email, password, displayName) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !uiState.isLoading
             ) {
