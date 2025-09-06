@@ -25,13 +25,12 @@ class AuthViewModel(
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
-    fun signUp(email: String, password: String) {
+    fun signUp(email: String, password: String, displayName: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, signUpError = null, loginError = null) }
-            val result = authRepository.signUp(email, password)
+            val result = authRepository.signUp(email, password, displayName)
             result.fold(
                 onSuccess = { uid ->
-                    authRepository.saveUser(uid, email)
                     _uiState.update {
                         it.copy(isLoading = false, isSignUpSuccess = true)
                     }
