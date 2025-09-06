@@ -11,6 +11,7 @@ import com.example.charactermatchingapp.domain.gallery.repository.GalleryReposit
 import com.example.charactermatchingapp.presentation.auth.AuthViewModel
 import com.example.charactermatchingapp.presentation.gallery.GalleryViewModel
 import com.example.charactermatchingapp.presentation.post.PostViewModel
+import com.example.charactermatchingapp.presentation.SharedViewModel
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -36,4 +37,6 @@ val appModule = module {
 
     single<PostRepository> { PostRepositoryImpl(get(),get()) }
     viewModelOf(::PostViewModel)
+
+    viewModelOf(::SharedViewModel)
 }
