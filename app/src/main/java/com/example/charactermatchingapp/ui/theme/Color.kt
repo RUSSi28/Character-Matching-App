@@ -2,12 +2,10 @@ package com.example.charactermatchingapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val MainColor = Color(0xFF28638a)
+val SubColor = Color(0xFFcae6ff)
+val SubTextColor = Color(0xFF004b70)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
+val MainTextColor = Color(0xFFffffff)
+val TopbarColor = Color(0xFF96ccf8)
 val Pink40 = Color(0xFF7D5260)
-
-val a = Color(0XFF4285F4)
