@@ -9,7 +9,7 @@ data class ArtworkDto(
     val authorName: String = "",
     val characterName: String = "",
     val characterDescription: String = "",
-    val imageUrl: String = "",
+    val imageUrl: String? = null,
     val thumbUrl: String? = null,
     val tags: List<String> = emptyList(),
     val likeCount: Int = 0,
