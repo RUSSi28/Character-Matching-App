@@ -22,10 +22,10 @@ import org.koin.test.check.checkModules
 
 class CheckModuleTest : KoinTest{
     val testModule = module {
-        single<FirebaseApp> { mockk<FirebaseApp>() }
-        single<FirebaseAuth> { mockk<FirebaseAuth>() }
-        single<FirebaseFirestore> { mockk<FirebaseFirestore>() }
-        single<FirebaseStorage> { mockk<FirebaseStorage>() }
+        single<FirebaseApp> { mockk() }
+        single<FirebaseAuth> { mockk(relaxed = true) }
+        single<FirebaseFirestore> { mockk() }
+        single<FirebaseStorage> { mockk() }
     }
     @get:Rule
     val koinTestRule = KoinTestRule.create {
@@ -35,10 +35,8 @@ class CheckModuleTest : KoinTest{
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
     @Test
-    fun `check dependencies`() {
-        koinTestRule.koin.checkModules {
-            withInstance<FirebaseAuth>(mockk(relaxed = true))
-        }
+    fun `check all Koin modules`() {
+        koinTestRule.koin.checkModules ()
     }
 }
 

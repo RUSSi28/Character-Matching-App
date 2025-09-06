@@ -1,42 +1,61 @@
 package com.example.charactermatchingapp.presentation.post
 
-import com.example.charactermatchingapp.domain.post.model.PostInfo
-import com.example.charactermatchingapp.ui.theme.CharacterMatchingAppTheme
-
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import com.google.accompanist.flowlayout.FlowRow
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import com.example.charactermatchingapp.domain.post.model.PostInfo
+import com.example.charactermatchingapp.ui.theme.CharacterMatchingAppTheme
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
+ @OptIn(ExperimentalMaterial3Api::class)
+ @Composable
 fun CharacterPostScreen(
-    modifier: Modifier = Modifier, // Add this line
+    modifier: Modifier = Modifier, // Re-add this line
     onPost: (PostInfo) -> Unit
 ) {
     var name by remember { mutableStateOf(TextFieldValue("")) }
@@ -112,24 +131,28 @@ fun CharacterPostScreen(
                     onValueChange = { tagInput = it },
                     label = { Text("タグを入力") },
                     modifier = Modifier.weight(1f),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = {
+                    singleLine = true
+                )
+                // 追加ボタン（secondary）
+                GradientButton(
+                    text = "追加",
+                    onClick = {
                         if (tagInput.text.isNotBlank() && tags.size < 10) {
                             tags = tags + tagInput.text
                             tagInput = TextFieldValue("") // 入力欄をクリア
                         }
-                    })
+                    },
+                    baseColor = MaterialTheme.colorScheme.secondary,
+                    textColor = MaterialTheme.colorScheme.onSecondary
                 )
             }
 
             // タグ表示
-            FlowRow(
+            LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                tags.forEach { tag ->
+                items(tags) { tag ->
                     Surface(
                         shape = RoundedCornerShape(16.dp),
                         color = MaterialTheme.colorScheme.primaryContainer,
@@ -185,8 +208,7 @@ fun CharacterPostScreen(
                 textColor = MaterialTheme.colorScheme.onPrimary
             )
         }
-
-        }
+}
 
 @Preview(showBackground = true)
 @Composable
@@ -222,3 +244,4 @@ fun GradientButton(
         Text(text, color = textColor)
     }
 }
+

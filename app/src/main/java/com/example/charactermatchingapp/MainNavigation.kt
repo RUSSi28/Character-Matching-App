@@ -11,7 +11,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -20,8 +19,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.charactermatchingapp.data.post.repository.PostRepository
-import com.example.charactermatchingapp.data.post.repository.PostRepositoryImpl
 import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
 import com.example.charactermatchingapp.presentation.auth.AuthViewModel
 import com.example.charactermatchingapp.presentation.auth.LoginScreen
