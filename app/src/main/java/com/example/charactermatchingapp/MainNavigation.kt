@@ -2,9 +2,16 @@ package com.example.charactermatchingapp
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -75,7 +82,8 @@ fun NavDestination.toBottomNavigationTab(): BottomNavigationTab {
     }
 }
 
-@SuppressLint("RestrictedApi")
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("RestrictedApi", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainNavigation(
     modifier: Modifier = Modifier,
@@ -94,6 +102,21 @@ fun MainNavigation(
     val scope = rememberCoroutineScope()
 
     Scaffold(
+        topBar = {
+            if (isBottomNavigationShown) {
+                TopAppBar(
+                    title = { Text("Character Matching App") },
+                    actions = {
+                        IconButton(onClick = { navController.navigate(Screen.Settings) }) {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = "Settings"
+                            )
+                        }
+                    }
+                )
+            }
+        },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             if (isBottomNavigationShown) {
@@ -234,7 +257,6 @@ private fun NavigationHost(
             val postViewModel: PostViewModel = koinViewModel()
 
             CharacterPostScreen(
-                modifier = modifier, // Pass the modifier here
                 onPost = { postInfo ->
                     postViewModel.savePost(postInfo)
                 },
