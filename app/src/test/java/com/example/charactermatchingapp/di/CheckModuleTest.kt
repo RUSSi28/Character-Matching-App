@@ -1,11 +1,9 @@
 package com.example.charactermatchingapp.di
 
-import org.koin.core.annotation.KoinInternalApi
-import org.koin.test.verify.verify
-
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,9 +22,10 @@ import org.koin.test.check.checkModules
 
 class CheckModuleTest : KoinTest{
     val testModule = module {
-        single<FirebaseApp> { mockk(relaxed = true) }
+        single<FirebaseApp> { mockk() }
         single<FirebaseAuth> { mockk(relaxed = true) }
-        single<FirebaseFirestore> { mockk(relaxed = true) }
+        single<FirebaseFirestore> { mockk() }
+        single<FirebaseStorage> { mockk() }
     }
     @get:Rule
     val koinTestRule = KoinTestRule.create {
