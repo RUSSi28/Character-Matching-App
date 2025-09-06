@@ -9,7 +9,6 @@ import com.example.charactermatchingapp.ui.theme.CharacterMatchingAppTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             CharacterMatchingAppTheme {
                 MainNavigation()
