@@ -196,8 +196,8 @@ private fun NavigationHost(
             }
             SignUpScreen(
                 uiState = authUiState,
-                onSignUp = { email, password ->
-                    authViewModel.signUp(email, password)
+                onSignUp = { email, password, displayName ->
+                    authViewModel.signUp(email, password, displayName)
                 },
                 onNavigateToLogin = {
                     navController.navigate(Screen.Login)
