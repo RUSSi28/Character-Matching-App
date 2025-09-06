@@ -147,7 +147,8 @@ private fun NavigationHost(
             )
         }
         composable<Screen.Add> {
-            FavoriteScreenNavHost("NjMe4XK8J4rm9f4ogvEj")
+            //お気に入り画面に遷移する
+            //FavoriteScreenNavHost("NjMe4XK8J4rm9f4ogvEj")
         }
         composable<Screen.Home> {
 
