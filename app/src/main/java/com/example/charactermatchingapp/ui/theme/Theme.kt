@@ -9,7 +9,6 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import com.example.charactermatchingapp.ui.theme.AppShapes
 
 private val DarkColorScheme = darkColorScheme(
     primary = MainColor,
@@ -49,6 +48,7 @@ fun CharacterMatchingAppTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
+
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
