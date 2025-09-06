@@ -37,10 +37,7 @@ class CheckModuleTest : KoinTest{
     val mainDispatcherRule = MainDispatcherRule()
     @Test
     fun `check all Koin modules`() {
-        koinTestRule.koin.checkModules {
-            withInstance<FirebaseAuth>(mockk(relaxed = true))
-            withInstance<FirebaseApp>(mockk(relaxed = true))
-        }
+        koinTestRule.koin.checkModules ()
     }
 }
 
