@@ -29,7 +29,7 @@ class PostRepositoryImpl(
             val postMap = postDto.toMap()
 
             // 3. Firestoreにデータを保存 (CharacterPostActivity.txtのsaveCharacterDataの一部)
-            firestore.collection("posts").add(postMap).await() // "Post"コレクション名を"posts"に変更
+            firestore.collection("artworks").add(postMap).await() // "Post"コレクション名を"posts"に変更
             Log.d("PostRepoImpl", "Post saved successfully: ${postInfo.name}")
 
             Result.success(Unit) // 成功
