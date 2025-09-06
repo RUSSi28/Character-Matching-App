@@ -60,8 +60,10 @@ fun DraggableCard(
     val coroutineScope = rememberCoroutineScope()
     val animX = remember { Animatable(0f) }
     val animY = remember { Animatable(0f) }
-    val rotation by derivedStateOf {
-        (animX.value / 60).coerceIn(-15f, 15f)
+    val rotation by remember {
+        derivedStateOf {
+            (animX.value / 60).coerceIn(-15f, 15f)
+        }
     }
     var textHeight by remember { mutableFloatStateOf(0f) }
     LaunchedEffect(animX.value, animY.value) {

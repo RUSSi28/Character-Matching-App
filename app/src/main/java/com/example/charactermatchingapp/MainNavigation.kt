@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -18,10 +20,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
+import com.example.charactermatchingapp.presentation.auth.AuthViewModel
+import com.example.charactermatchingapp.presentation.auth.LoginScreen
+import com.example.charactermatchingapp.presentation.auth.SignUpScreen
+import com.example.charactermatchingapp.presentation.gallery.GalleryApp
+import com.example.charactermatchingapp.presentation.gallery.GalleryViewModel
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.Serializable
+import org.koin.androidx.compose.koinViewModel
 
 @Serializable
 sealed class Screen(val route: String) {
@@ -29,18 +37,24 @@ sealed class Screen(val route: String) {
     data object Matching : Screen("matching")
 
     @Serializable
-    data object Add : Screen("add")
+    data object Gallery : Screen("gallery")
 
     @Serializable
     data object Home : Screen("home")
 
     @Serializable
     data object Settings : Screen("settings")
+
+    @Serializable
+    data object Login : Screen("login")
+
+    @Serializable
+    data object SignUp : Screen("signup")
 }
 
 private val bottomNavigationAllowedScreen = setOf(
     Screen.Matching,
-    Screen.Add,
+    Screen.Gallery,
     Screen.Home,
     Screen.Settings
 )
@@ -48,7 +62,7 @@ private val bottomNavigationAllowedScreen = setOf(
 fun NavDestination.toBottomNavigationTab(): BottomNavigationTab {
     return when {
         hasRoute(Screen.Matching::class) -> BottomNavigationTab.Matching
-        hasRoute(Screen.Add::class) -> BottomNavigationTab.Add
+        hasRoute(Screen.Gallery::class) -> BottomNavigationTab.Gallery
         hasRoute(Screen.Home::class) -> BottomNavigationTab.Home
         hasRoute(Screen.Settings::class) -> BottomNavigationTab.Settings
         else -> BottomNavigationTab.Matching
@@ -104,6 +118,8 @@ private fun NavigationHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
+    val startDestination = Screen.Login
+
     // TODO(): リモートからデータを読み込めるようにして消す
     val items = remember {
         mutableStateListOf(
@@ -135,9 +151,57 @@ private fun NavigationHost(
     }
     NavHost(
         navController = navController,
-        startDestination = Screen.Matching,
+        startDestination = startDestination,
         modifier = modifier
     ) {
+        composable<Screen.Login> {
+            val authViewModel: AuthViewModel = koinViewModel()
+            val authUiState by authViewModel.uiState.collectAsState()
+
+            LaunchedEffect(authUiState.isLoginSuccess) {
+                if (authUiState.isLoginSuccess) {
+                    navController.navigate(Screen.Matching) {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
+                    }
+                    authViewModel.resetAuthStates()
+                }
+            }
+            LoginScreen(
+                uiState = authUiState,
+                onLogin = { email, password ->
+                    authViewModel.login(email, password)
+                },
+                onNavigateToSignUp = {
+                    navController.navigate(Screen.SignUp)
+                }
+            )
+        }
+        composable<Screen.SignUp> {
+            val authViewModel: AuthViewModel = koinViewModel()
+            val authUiState by authViewModel.uiState.collectAsState()
+
+            LaunchedEffect(authUiState.isSignUpSuccess) {
+                if (authUiState.isSignUpSuccess) {
+                    navController.navigate(Screen.Matching) {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
+                    }
+                    authViewModel.resetAuthStates()
+                }
+            }
+            SignUpScreen(
+                uiState = authUiState,
+                onSignUp = { email, password ->
+                    authViewModel.signUp(email, password)
+                },
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login)
+                }
+            )
+        }
         composable<Screen.Matching> {
             CharacterMatchingScreen(
                 items = items.toImmutableList(),
@@ -146,9 +210,11 @@ private fun NavigationHost(
                 }
             )
         }
-        composable<Screen.Add> {
+        composable<Screen.Gallery> {
             //お気に入り画面に遷移する
             //FavoriteScreenNavHost("NjMe4XK8J4rm9f4ogvEj")
+            val galleryViewModel: GalleryViewModel = koinViewModel()
+            GalleryApp(galleryViewModel = galleryViewModel)
         }
         composable<Screen.Home> {
 

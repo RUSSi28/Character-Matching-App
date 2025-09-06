@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">CharacterMatchingApp</string>
+    <string name="affirmation1">コンテナくん</string>
+    <string name="affirmation2">風呂ちゃん</string>
+    <string name="affirmation3">クジラーん</string>
+    <string name="affirmation4">スマホ中毒ゾンビー</string>
+    <string name="affirmation5">ダイヤモンド富士ちゃん</string>
+    <string name="affirmation6">この中には誰が入っているのでしょうか、その答えを子供たちは知っているのか</string>
+    <string name="affirmation7">天使ちゃん</string>
+    <string name="affirmation8">ロボ男</string>
+    <string name="affirmation9">スナ男キン</string>
+    <string name="affirmation10">皆のアイドル</string>
+
+    <string name="login_title">ログイン</string>
+    <string name="signup_title">新規登録</string>
+    <string name="email_label">メールアドレス</string>
+    <string name="password_label">パスワード</string>
+    <string name="login_button_text">ログイン</string>
+    <string name="signup_button_text">登録</string>
+    <string name="login_navigate_to_signup">アカウントをお持ちでない場合は新規登録</string>
+    <string name="signup_navigate_to_login">すでにアカウントをお持ちの場合はログイン</string>
 </resources>
