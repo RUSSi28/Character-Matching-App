@@ -25,6 +25,7 @@ import com.example.charactermatchingapp.presentation.auth.AuthViewModel
 import com.example.charactermatchingapp.presentation.auth.LoginScreen
 import com.example.charactermatchingapp.presentation.auth.SignUpScreen
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
+import com.example.charactermatchingapp.presentation.matching.CharacterMatchingViewModel
 import com.example.charactermatchingapp.presentation.recommendation.RecommendationScreen
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
@@ -119,36 +120,6 @@ private fun NavigationHost(
     modifier: Modifier = Modifier,
 ) {
     val startDestination = Screen.Login
-
-    // TODO(): リモートからデータを読み込めるようにして消す
-    val items = remember {
-        mutableStateListOf(
-            CharacterInfo(
-                id = "1",
-                name = "Character 1",
-                image = "https://example.com/image1.jpg",
-                description = "Description for Character 1",
-                tags = listOf("優しい", "天真爛漫"),
-                contributor = "Contributor 1"
-            ),
-            CharacterInfo(
-                id = "2",
-                name = "Character 2",
-                image = "https://example.com/image2.jpg",
-                description = "Description for Character 2",
-                tags = listOf("根暗", "リスカ", "眼帯", "デコラ風", "優しい"),
-                contributor = "Contributor 1"
-            ),
-            CharacterInfo(
-                id = "3",
-                name = "Character 3",
-                image = "https://example.com/image3.jpg",
-                description = "Description for Character 3",
-                tags = listOf("あほ", "明るい"),
-                contributor = "Contributor 2"
-            )
-        )
-    }
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -203,11 +174,21 @@ private fun NavigationHost(
             )
         }
         composable<Screen.Matching> {
+            val characterMatchingViewModel: CharacterMatchingViewModel = koinViewModel()
+            val matchingCharacters by characterMatchingViewModel.matchingCharacters.collectAsState()
+            val isLoading by characterMatchingViewModel.isLoading.collectAsState()
             CharacterMatchingScreen(
-                items = items.toImmutableList(),
-                onItemsDrop = {
-                    items.removeAt(items.lastIndex)
-                }
+                items = matchingCharacters.toImmutableList(),
+                isLoading = isLoading,
+                onItemsSwipedRight = { characterInfo ->
+                    characterMatchingViewModel.likeCharacterInfo(characterInfo)
+                },
+                onItemsSwipedUp = {
+                    characterMatchingViewModel.removeLastItem()
+                },
+                onItemsSwipedLeft = {
+                    characterMatchingViewModel.removeLastItem()
+                },
             )
         }
         composable<Screen.Gallery> {
