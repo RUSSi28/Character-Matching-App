@@ -24,8 +24,6 @@ import com.example.charactermatchingapp.presentation.SharedViewModel
 import com.example.charactermatchingapp.presentation.auth.AuthViewModel
 import com.example.charactermatchingapp.presentation.auth.LoginScreen
 import com.example.charactermatchingapp.presentation.auth.SignUpScreen
-import com.example.charactermatchingapp.presentation.gallery.GalleryApp
-import com.example.charactermatchingapp.presentation.gallery.GalleryViewModel
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
 import com.example.charactermatchingapp.presentation.recommendation.RecommendationScreen
 import dev.chrisbanes.haze.rememberHazeState
@@ -214,9 +212,11 @@ private fun NavigationHost(
         }
         composable<Screen.Gallery> {
             //お気に入り画面に遷移する
-            //FavoriteScreenNavHost("NjMe4XK8J4rm9f4ogvEj")
-            val galleryViewModel: GalleryViewModel = koinViewModel()
-            GalleryApp(galleryViewModel = galleryViewModel)
+            val sharedViewModel: SharedViewModel = koinViewModel()
+            val userId = sharedViewModel.currentUserProvider.getCurrentUserId()
+            if (userId != null) {
+                FavoriteScreenNavHost()
+            }
         }
         composable<Screen.Home> {
             val sharedViewModel: SharedViewModel = koinViewModel()
