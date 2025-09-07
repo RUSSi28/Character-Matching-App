@@ -8,6 +8,7 @@ val SubTextColor = Color(0xFF004b70)
 
 val MainTextColor = Color(0xFFffffff)
 val TopbarColor = Color(0xFF96ccf8)
+val BottomBarSubColor = Color(0xFFA6A7A8)
 val Pink40 = Color(0xFF7D5260)
 val TextMainColor = Color(0xFF3A3A3A)
 val TextSubColor = Color(0xFF626262)

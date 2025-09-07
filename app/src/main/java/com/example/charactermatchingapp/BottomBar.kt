@@ -42,6 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.charactermatchingapp.ui.theme.BottomBarSubColor
+import com.example.charactermatchingapp.ui.theme.MainColor
 import dev.chrisbanes.haze.HazeDefaults
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
@@ -61,7 +63,7 @@ fun GlassmorphicBottomNavigation(
         )
     )
     val animatedColor by animateColorAsState(
-        targetValue = Color(0xFF4A99CE),
+        targetValue = MainColor,
         label = "animatedColor",
         animationSpec = spring(
             stiffness = Spring.StiffnessLow,
@@ -199,17 +201,17 @@ fun BottomNavigationItem(
             imageVector = icon,
             contentDescription = null,
             tint = if (selected) {
-                Color(0xFF4A99CE)
+                MainColor
             } else {
-                Color(0xFFD7D7D7)
+                BottomBarSubColor
             }
         )
         Text(
             text = label,
             color = if (selected) {
-                Color(0xFF4A99CE)
+                MainColor
             } else {
-                Color(0xFFD7D7D7)
+                BottomBarSubColor
             },
             fontSize = 12.sp,
             fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold
