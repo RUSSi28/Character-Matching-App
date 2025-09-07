@@ -21,12 +21,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -50,7 +55,9 @@ import com.example.charactermatchingapp.ui.theme.CharacterMatchingAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CharacterPostScreen(onPost: (PostInfo) -> Unit) {
+fun CharacterPostScreen(
+    onPost: (PostInfo) -> Unit,
+    onClick: () -> Unit) {
     var name by remember { mutableStateOf(TextFieldValue("")) }
     var description by remember { mutableStateOf(TextFieldValue("")) }
 
@@ -81,9 +88,18 @@ fun CharacterPostScreen(onPost: (PostInfo) -> Unit) {
             ) {
                 TopAppBar(
                     title = { Text("キャラクター投稿") },
+                    navigationIcon = {
+                        IconButton(onClick = onClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "戻る"
+                            )
+                        }
+                    },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
-                        titleContentColor = Color.White
+                        titleContentColor = Color.White,
+                        navigationIconContentColor = Color.White
                     )
                 )
             }
@@ -230,7 +246,7 @@ fun CharacterPostScreen(onPost: (PostInfo) -> Unit) {
 @Composable
 fun CharacterPostScreenPreview() {
     CharacterMatchingAppTheme {
-        CharacterPostScreen(onPost = {})
+        CharacterPostScreen(onPost = {},onClick = {})
     }
 }
 

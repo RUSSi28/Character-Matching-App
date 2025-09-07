@@ -9,5 +9,7 @@ object AppDestinations {
     const val TIMELINE_ARG_POST_ID = "postId"
     const val TIMELINE_ROUTE = "timeline/{$TIMELINE_ARG_ACCOUNT_ID}/{$TIMELINE_ARG_POST_ID}"
     const val FAVORITE_ROUTE = "favorite"
-    const val ACCOUNT_ROUTE = "account"
+    const val GALLERY_ROUTE = "gallery"
+    const val ACCOUNT_ARG_AUTHOR_ID = "authorId"
+    const val ACCOUNT_ROUTE = "account/{$ACCOUNT_ARG_AUTHOR_ID}"
 }

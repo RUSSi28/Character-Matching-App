@@ -20,20 +20,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
+import com.example.charactermatchingapp.presentation.SharedViewModel
 import com.example.charactermatchingapp.presentation.auth.AuthViewModel
 import com.example.charactermatchingapp.presentation.auth.LoginScreen
 import com.example.charactermatchingapp.presentation.auth.SignUpScreen
-import com.example.charactermatchingapp.presentation.gallery.GalleryApp
-import com.example.charactermatchingapp.presentation.gallery.GalleryViewModel
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
-import com.example.charactermatchingapp.presentation.post.CharacterPostScreen
-import com.example.charactermatchingapp.presentation.post.PostViewModel
-import com.example.charactermatchingapp.presentation.SharedViewModel
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
-import com.example.charactermatchingapp.domain.auth.service.CurrentUserProvider
 
 @Serializable
 sealed class Screen(val route: String) {
@@ -216,9 +211,11 @@ private fun NavigationHost(
         }
         composable<Screen.Gallery> {
             //お気に入り画面に遷移する
-            //FavoriteScreenNavHost("NjMe4XK8J4rm9f4ogvEj")
-            val galleryViewModel: GalleryViewModel = koinViewModel()
-            GalleryApp(galleryViewModel = galleryViewModel)
+            val sharedViewModel: SharedViewModel = koinViewModel()
+            val userId = sharedViewModel.currentUserProvider.getCurrentUserId()
+            if (userId != null) {
+                FavoriteScreenNavHost()
+            }
         }
         composable<Screen.Home> {
             val sharedViewModel: SharedViewModel = koinViewModel()
@@ -228,11 +225,11 @@ private fun NavigationHost(
             }
         }
         composable<Screen.Settings> {
-            val postViewModel: PostViewModel = koinViewModel()
+            //val postViewModel: PostViewModel = koinViewModel()
 
-            CharacterPostScreen(onPost = { postInfo ->
-                postViewModel.savePost(postInfo)
-            })
+            //CharacterPostScreen(onPost = { postInfo ->
+            //postViewModel.savePost(postInfo)
+            //})
         }
     }
 }
