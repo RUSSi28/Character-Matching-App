@@ -8,4 +8,5 @@ interface CharacterMatchingRepository {
     suspend fun likeCharacterInfo(characterInfo: CharacterInfo)
     fun bookmarkCharacterInfo(characterInfo: CharacterInfo)
     fun dislikeCharacterInfo(characterInfo: CharacterInfo)
+    suspend fun onCardLiked(userId: String, likedArtworkTags: List<String>): Result<Unit>
 }

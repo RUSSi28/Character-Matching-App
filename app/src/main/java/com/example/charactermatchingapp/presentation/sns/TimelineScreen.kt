@@ -128,16 +128,14 @@ fun TimelineScreen(
 @Composable
 fun TimelineScreenPreview() {
     val sampleProfile = Profile(
-        accountName = "User Name",
-        headerImageResId = "",
-        iconImageResId = "",
-        profileText = "ここにプロフィール文が入ります。この文章はサンプルです。"
+        displayName = "User Name",
+        bio = "ここにプロフィール文が入ります。この文章はサンプルです。"
     )
     val samplePosts = List(50) { i ->
         Post(
             id = i.toString(),
-            userName = sampleProfile.accountName,
-            userIconResId = sampleProfile.iconImageResId,
+            userName = sampleProfile.displayName,
+            userIconResId = sampleProfile.iconImageUrl ?: "", // Handle nullability
             characterName = "キャラ名 $i",
             characterText = "キャラテキスト$i",
             postImageResId = "",

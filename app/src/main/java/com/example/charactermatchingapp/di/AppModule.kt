@@ -20,6 +20,7 @@ import com.example.charactermatchingapp.presentation.post.PostViewModel
 import com.example.charactermatchingapp.presentation.recommendation.RecommendationViewModel
 import com.example.charactermatchingapp.presentation.SharedViewModel
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingViewModel
+import com.example.charactermatchingapp.presentation.sns.AccountSettingsViewModel
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -55,4 +56,5 @@ val appModule = module {
     viewModelOf(::CharacterMatchingViewModel)
 
     viewModelOf(::SharedViewModel)
+    viewModelOf(::AccountSettingsViewModel)
 }

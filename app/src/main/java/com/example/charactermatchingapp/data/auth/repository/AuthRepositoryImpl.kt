@@ -25,6 +25,7 @@ class AuthRepositoryImpl(
                     "bio" to null,
                     "likedCount" to 0,
                     "postsCount" to 0,
+                    "likesTags" to emptyList<String>(),
                     "createdAt" to Timestamp.now()
                 )
                 firestore.collection("accounts").document(uid).set(accountData).await()

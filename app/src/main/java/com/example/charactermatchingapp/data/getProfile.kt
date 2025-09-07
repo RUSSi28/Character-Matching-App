@@ -13,12 +13,7 @@ class ProfileRepository {
             val document = db.collection("accounts").document(accountId).get().await()
             if (document.exists()) {
                 // ここでFirestoreのデータをProfileオブジェクトに変換する
-                Profile(
-                    accountName = document.getString("displayName") ?: "",
-                    headerImageResId = document.getString("headerImageUrl") ?: "",
-                    iconImageResId = document.getString("iconImageUrl") ?: "",
-                    profileText = document.getString("bio") ?: ""
-                )
+                document.toObject(Profile::class.java)
             } else {
                 null
             }
