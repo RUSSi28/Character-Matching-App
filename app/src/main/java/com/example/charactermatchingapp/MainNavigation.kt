@@ -2,13 +2,23 @@ package com.example.charactermatchingapp
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavDestination
@@ -29,6 +39,7 @@ import com.example.charactermatchingapp.presentation.matching.CharacterMatchingV
 import com.example.charactermatchingapp.presentation.recommendation.RecommendationScreen
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 
@@ -70,7 +81,8 @@ fun NavDestination.toBottomNavigationTab(): BottomNavigationTab {
     }
 }
 
-@SuppressLint("RestrictedApi")
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("RestrictedApi", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainNavigation(
     modifier: Modifier = Modifier,
@@ -85,7 +97,26 @@ fun MainNavigation(
     }
 
     val hazeState = rememberHazeState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     Scaffold(
+        topBar = {
+            if (isBottomNavigationShown) {
+                TopAppBar(
+                    title = { Text("Character Matching App") },
+                    actions = {
+                        IconButton(onClick = { navController.navigate(Screen.Settings) }) {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = "Settings"
+                            )
+                        }
+                    }
+                )
+            }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             if (isBottomNavigationShown) {
                 GlassmorphicBottomNavigation(
@@ -110,6 +141,7 @@ fun MainNavigation(
         NavigationHost(
             navController = navController,
             modifier = Modifier.padding(innerPadding),
+            snackbarHostState = snackbarHostState
         )
     }
 }
@@ -118,8 +150,40 @@ fun MainNavigation(
 private fun NavigationHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState
 ) {
     val startDestination = Screen.Login
+    val scope = rememberCoroutineScope()
+
+    // TODO(): リモートからデータを読み込めるようにして消す
+    val items = remember {
+        mutableStateListOf(
+            CharacterInfo(
+                id = "1",
+                name = "Character 1",
+                image = "https://example.com/image1.jpg",
+                description = "Description for Character 1",
+                tags = listOf("優しい", "天真爛漫"),
+                contributor = "Contributor 1"
+            ),
+            CharacterInfo(
+                id = "2",
+                name = "Character 2",
+                image = "https://example.com/image2.jpg",
+                description = "Description for Character 2",
+                tags = listOf("根暗", "リスカ", "眼帯", "デコラ風", "優しい"),
+                contributor = "Contributor 1"
+            ),
+            CharacterInfo(
+                id = "3",
+                name = "Character 3",
+                image = "https://example.com/image3.jpg",
+                description = "Description for Character 3",
+                tags = listOf("あほ", "明るい"),
+                contributor = "Contributor 2"
+            )
+        )
+    }
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -206,6 +270,20 @@ private fun NavigationHost(
                 PosterViewScreenNavHost(userId)
             }
         }
+        composable<Screen.Settings> {
+            val postViewModel: PostViewModel = koinViewModel()
+
+            CharacterPostScreen(
+                onPost = { postInfo ->
+                    postViewModel.savePost(postInfo)
+                },
+                onShowSnackbar = { message ->
+                    scope.launch {
+                        snackbarHostState.showSnackbar(message)
+                    }
+                }
+            )
+
         composable<Screen.Recommend> {
             RecommendationScreen()
         }
