@@ -1,3 +1,5 @@
+package com.example.charactermatchingapp.data
+
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.charactermatchingapp.domain.matching.model.Post
@@ -20,7 +22,17 @@ class PostPagingSource(
 
             val lastVisibleDocument = currentPage.documents.lastOrNull()
 
-            val posts = currentPage.toObjects(Post::class.java)
+            val posts = currentPage.documents.map { document ->
+                Post(
+                    id = document.id,
+                    userName = document.getString("authorName") ?: "",
+                    userIconResId = document.getString("iconImageUrl") ?: "",
+                    characterName = document.getString("characterName") ?: "",
+                    characterText = document.getString("characterDescription") ?: "",
+                    postImageResId = document.getString("imageUrl") ?: "",
+                    posttags = document.get("tags") as? List<String> ?: emptyList()
+                )
+            }
 
             LoadResult.Page(
                 data = posts,

@@ -12,6 +12,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -32,7 +33,6 @@ import com.example.charactermatchingapp.data.PostRepository
 import com.example.charactermatchingapp.domain.matching.model.Post
 import com.example.charactermatchingapp.domain.matching.model.Profile
 import kotlinx.coroutines.flow.flowOf
-import androidx.compose.material3.Surface
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,12 +48,30 @@ fun TimelineScreen(
             postRepository = PostRepository() // 本来はDI（依存性注入）するのが望ましい
         )
     )
-    val posts by viewModel.postsState.collectAsState()
+
+    val posts: LazyPagingItems<Post> = viewModel.posts.collectAsLazyPagingItems()
     val initialIndex by viewModel.initialScrollIndex.collectAsState()
 
     // ★★★ LazyColumnの状態を管理するためのState ★★★
     val lazyListState = rememberLazyListState()
 
+    // Pagingのデータロード状態を監視し、ロードが完了したらViewModelにインデックス検索を依頼する
+    LaunchedEffect(posts.itemCount) {
+        if (posts.itemCount > 0) {
+            // peek() を使って現在のアイテムリストを取得する代替案
+            val currentItems = List(posts.itemCount) { index ->
+                posts.peek(index) // peek() で各アイテムを取得
+            }.filterNotNull() // プレースホルダーなどでnullになる可能性があればフィルタリング
+
+            if (currentItems.isNotEmpty()) {
+                viewModel.findInitialPostIndex(currentItems)
+            }
+        }
+        //if (posts.itemCount != 0) {
+        // 現在のリストのスナップショットをViewModelに渡してインデックス計算を依頼
+        //viewModel.findInitialPostIndex(posts.snapshot().items)
+        //}
+    }
     // ★★★ initialIndexの値が確定したら、一度だけスクロール処理を実行 ★★★
     LaunchedEffect(initialIndex) {
         if (initialIndex > 0) { // 最初の要素以外の場合にスクロール
@@ -91,12 +109,14 @@ fun TimelineScreen(
                 state = lazyListState
             ) {
                 items(
-                    count = posts.size,
-                    key = { index -> posts[index].id } // 各アイテムを区別するためのキー
+                    count = posts.itemCount,
+                    key = { index -> posts.peek(index)?.id ?: index } // 各アイテムを区別するためのキー
                 ) { index ->
                     val post = posts[index]
-                    PostItemScreen(post)
-                    HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                    if (post != null) {
+                        PostItemScreen(post)
+                        HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                    }
                 }
             }
         }

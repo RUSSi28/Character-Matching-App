@@ -11,6 +11,9 @@ import com.example.charactermatchingapp.presentation.sns.PosterViewAccountScreen
 import com.example.charactermatchingapp.presentation.sns.TimelineScreen
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
+import com.example.charactermatchingapp.presentation.post.CharacterPostScreen
+import com.example.charactermatchingapp.presentation.post.PostViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun PosterViewScreenNavHost(
@@ -73,7 +76,13 @@ fun PosterViewScreenNavHost(
         }
         // アカウント設定画面
         composable(AppDestinations.POST_EDIT_ROUTE) {
-            PostCreationScreen(
+            val postViewModel: PostViewModel = koinViewModel()
+            CharacterPostScreen(
+                onPost = { postInfo ->
+                    // 投稿ボタンが押されたらアカウント画面に戻る
+                    postViewModel.savePost(postInfo)
+                    navController.popBackStack()
+                },
                 onClick = {
                     // 戻る・更新ボタンが押されたら前の画面に戻る
                     navController.popBackStack()

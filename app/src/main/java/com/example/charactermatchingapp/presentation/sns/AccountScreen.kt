@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -31,7 +31,6 @@ import com.example.charactermatchingapp.R
 import com.example.charactermatchingapp.domain.matching.model.Post
 import com.example.charactermatchingapp.domain.matching.model.Profile
 import kotlinx.coroutines.flow.flowOf
-import androidx.compose.material3.Surface
 
 @Composable
 fun AccountScreen(
@@ -44,7 +43,8 @@ fun AccountScreen(
     )
     // ViewModelからプロフィールと投稿リストの状態を監視
     val profile by viewModel.profileState.collectAsState()
-    val posts by viewModel.postsState.collectAsState()
+    //val posts = viewModel.posts.collectAsLazyPagingItems()
+    val posts = viewModel.postsFlow.collectAsLazyPagingItems()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -62,7 +62,7 @@ fun AccountScreen(
                     }
                 }
                 items(
-                    count = posts.size,
+                    count = posts.itemCount,
                     key = { index -> posts[index]?.id ?: index }
                 ) { index ->
                     val post = posts[index]

@@ -3,17 +3,19 @@ package com.example.charactermatchingapp.presentation.sns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.charactermatchingapp.data.PostRepository
 import com.example.charactermatchingapp.domain.matching.model.Post
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 /**
  * タイムライン画面用のViewModel
  * @param accountId 表示する投稿の所有者ID
- * @param initialPostId 最初に表示したい投稿のID
+ * @param initialPostId 初期表示時にスクロールする対象の投稿ID
  * @param postRepository 投稿データを取得するためのリポジトリ
  */
 class TimelineViewModel(
@@ -22,30 +24,31 @@ class TimelineViewModel(
     private val postRepository: PostRepository
 ) : ViewModel() {
 
-    // 投稿リストの状態を保持するStateFlow
-    private val _postsState = MutableStateFlow<List<Post>>(emptyList())
-    val postsState: StateFlow<List<Post>> = _postsState.asStateFlow()
-
-    // 初期スクロール位置のインデックスを保持するStateFlow
-    private val _initialScrollIndex = MutableStateFlow(0)
+    val posts: Flow<PagingData<Post>> = postRepository.getUserArtworks(accountId)
+        .cachedIn(viewModelScope)
+    // ★★★ 初期スクロール位置のインデックスを保持するStateFlow ★★★
+    private val _initialScrollIndex = MutableStateFlow(-1) // -1: 未計算
     val initialScrollIndex: StateFlow<Int> = _initialScrollIndex.asStateFlow()
 
-    init {
-        loadUserPosts()
-    }
+    // 最初のインデックス検索を一度だけ実行するためのフラグ
+    private var isInitialIndexSearched = false
 
-    private fun loadUserPosts() {
-        viewModelScope.launch {
-            // 指定されたアカウントの投稿をすべて取得
-            val posts = postRepository.getUserArtworks(accountId)
-            _postsState.value = posts
+    /**
+     * UI側から投稿リストが渡された際に、initialPostIdに一致する投稿のインデックスを検索し、
+     * initialScrollIndexを更新する。
+     * 検索は一度しか実行されない。
+     * @param posts 現在表示されている投稿のリスト（スナップショット）
+     */
+    fun findInitialPostIndex(posts: List<Post?>) {
+        // 既に検索済みか、スクロール対象のIDがなければ何もしない
+        if (isInitialIndexSearched || initialPostId.isBlank()) {
+            return
+        }
 
-            // 取得した投稿リストの中から、最初に表示したい投稿のインデックスを探す
-            val index = posts.indexOfFirst { it.id == initialPostId }
-            if (index != -1) {
-                // インデックスが見つかれば、初期スクロール位置として設定
-                _initialScrollIndex.value = index
-            }
+        val index = posts.indexOfFirst { it?.id == initialPostId }
+        if (index != -1) {
+            _initialScrollIndex.value = index
+            isInitialIndexSearched = true // 検索済みフラグを立てる
         }
     }
 }
@@ -61,7 +64,7 @@ class TimelineViewModelFactory(
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TimelineViewModel::class.java)) {
-            return TimelineViewModel(accountId, initialPostId, postRepository) as T
+            return TimelineViewModel(accountId, initialPostId , postRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

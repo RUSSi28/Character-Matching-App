@@ -20,11 +20,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +59,8 @@ fun CharacterPostScreen(
     onPost: (PostInfo) -> Unit,
     onShowSnackbar: (String) -> Unit
 ) {
+    onPost: (PostInfo) -> Unit,
+    onClick: () -> Unit) {
     var name by remember { mutableStateOf(TextFieldValue("")) }
     var description by remember { mutableStateOf(TextFieldValue("")) }
 
@@ -99,6 +108,22 @@ fun CharacterPostScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text("No Image", color = Color.White)
+                TopAppBar(
+                    title = { Text("キャラクター投稿") },
+                    navigationIcon = {
+                        IconButton(onClick = onClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "戻る"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        titleContentColor = Color.White,
+                        navigationIconContentColor = Color.White
+                    )
+                )
             }
         }
 

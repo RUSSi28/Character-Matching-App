@@ -27,11 +27,12 @@ import com.example.charactermatchingapp.presentation.SharedViewModel
 import com.example.charactermatchingapp.presentation.auth.AuthViewModel
 import com.example.charactermatchingapp.presentation.auth.LoginScreen
 import com.example.charactermatchingapp.presentation.auth.SignUpScreen
-import com.example.charactermatchingapp.presentation.gallery.GalleryApp
-import com.example.charactermatchingapp.presentation.gallery.GalleryViewModel
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
 import com.example.charactermatchingapp.presentation.post.CharacterPostScreen
 import com.example.charactermatchingapp.presentation.post.PostViewModel
+
+import com.example.charactermatchingapp.presentation.matching.CharacterMatchingViewModel
+
 import com.example.charactermatchingapp.presentation.recommendation.RecommendationScreen
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
@@ -221,16 +222,35 @@ private fun NavigationHost(
             )
         }
         composable<Screen.Matching> {
+            val characterMatchingViewModel: CharacterMatchingViewModel = koinViewModel()
+            val matchingCharacters by characterMatchingViewModel.matchingCharacters.collectAsState()
+            val isLoading by characterMatchingViewModel.isLoading.collectAsState()
             CharacterMatchingScreen(
-                items = items.toImmutableList(),
-                onItemsDrop = {
-                    items.removeAt(items.lastIndex)
-                }
+                items = matchingCharacters.toImmutableList(),
+                isLoading = isLoading,
+                onItemsSwipedRight = { characterInfo ->
+                    characterMatchingViewModel.likeCharacterInfo(characterInfo)
+                },
+                onItemsSwipedUp = {
+                    characterMatchingViewModel.removeLastItem()
+                },
+                onItemsSwipedLeft = {
+                    characterMatchingViewModel.removeLastItem()
+                },
             )
         }
         composable<Screen.Gallery> {
+
             val galleryViewModel: GalleryViewModel = koinViewModel()
             GalleryApp(galleryViewModel = galleryViewModel)
+
+            //お気に入り画面に遷移する
+            val sharedViewModel: SharedViewModel = koinViewModel()
+            val userId = sharedViewModel.currentUserProvider.getCurrentUserId()
+            if (userId != null) {
+                FavoriteScreenNavHost()
+            }
+
         }
         composable<Screen.Home> {
             val sharedViewModel: SharedViewModel = koinViewModel()

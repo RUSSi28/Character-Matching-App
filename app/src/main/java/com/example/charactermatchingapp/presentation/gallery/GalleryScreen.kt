@@ -40,7 +40,7 @@ import coil.compose.AsyncImage
 import com.google.firebase.Timestamp
 
 @Composable
-fun GalleryApp(modifier: Modifier = Modifier, galleryViewModel: GalleryViewModel = viewModel()) {
+fun GalleryApp(modifier: Modifier = Modifier, galleryViewModel: GalleryViewModel = viewModel(), onItemClick: (String) -> Unit) {
     val galleryItems by galleryViewModel.galleryItems.collectAsState()
     val isLoading by galleryViewModel.isLoading.collectAsState()
     val canLoadNext by galleryViewModel.canLoadNext.collectAsState()
@@ -52,6 +52,9 @@ fun GalleryApp(modifier: Modifier = Modifier, galleryViewModel: GalleryViewModel
     ) {
         GalleryItemList(
             galleryItems = galleryItems,
+            onItemClick = { galleryItem ->
+                onItemClick(galleryItem.authorId)
+            },
             modifier = Modifier.weight(1f) // Take available space
         )
 
@@ -85,6 +88,7 @@ fun GalleryApp(modifier: Modifier = Modifier, galleryViewModel: GalleryViewModel
 @Composable
 fun GalleryItemList(
     galleryItems: List<GalleryItem>,
+    onItemClick: (GalleryItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -95,15 +99,17 @@ fun GalleryItemList(
         items(galleryItems) { galleryItem ->
             GalleryItemCard(
                 galleryItem = galleryItem,
+                onClick = { onItemClick(galleryItem) }
             )
         }
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
-fun GalleryItemCard(galleryItem: GalleryItem, modifier: Modifier = Modifier) {
+fun GalleryItemCard(galleryItem: GalleryItem, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Card(
+        onClick = onClick,
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -162,7 +168,7 @@ fun GalleryItemCard(galleryItem: GalleryItem, modifier: Modifier = Modifier) {
 private fun GalleryItemCardPreview() {
     CharacterMatchingAppTheme {
         GalleryItemCard(
-            GalleryItem(
+            galleryItem = GalleryItem(
                 artworkId = "1",
                 authorId = "author1",
                 authorName = "Test Author",
@@ -173,7 +179,8 @@ private fun GalleryItemCardPreview() {
                 tags = listOf("#tag1", "#tag2"),
                 likeCount = 10,
                 postedAt = Timestamp.now()
-            )
+            ),
+            onClick = {}
         )
     }
 }
@@ -182,6 +189,6 @@ private fun GalleryItemCardPreview() {
 @Composable
 private fun GalleryAppPreview() {
     CharacterMatchingAppTheme {
-        GalleryApp()
+        GalleryApp(onItemClick = {})
     }
 }

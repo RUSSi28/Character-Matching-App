@@ -62,7 +62,9 @@ fun PosterViewAccountScreen(
     )
     // ViewModelからプロフィールと投稿リストの状態を監視
     val profile by viewModel.profileState.collectAsState()
-    val posts by viewModel.postsState.collectAsState()
+    //val posts = viewModel.posts.collectAsLazyPagingItems()
+    val posts = viewModel.postsFlow.collectAsLazyPagingItems()
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background // テーマで定義された背景色（通常は白）を適用
@@ -107,22 +109,24 @@ fun PosterViewAccountScreen(
                         }
                     }
                     items(
-                        count = posts.size,
-                        key = { index -> posts[index].id }
+                        count = posts.itemCount,
+                        key = { index -> posts[index]?.id ?: index }
                     ) { index ->
                         val post = posts[index]
-                        Image(
-                            painter = if (LocalInspectionMode.current) {
-                                painterResource(id = R.drawable.post_example)
-                            } else {
-                                rememberAsyncImagePainter(model = post.postImageResId)
-                            },
-                            contentDescription = "Post Image ${post.id}",
-                            modifier = Modifier
-                                .aspectRatio(1f)
-                                .clickable { onPostClick(post) },
-                            contentScale = ContentScale.Crop
-                        )
+                        if (post != null) {
+                            Image(
+                                painter = if (LocalInspectionMode.current) {
+                                    painterResource(id = R.drawable.post_example)
+                                } else {
+                                    rememberAsyncImagePainter(model = post.postImageResId)
+                                },
+                                contentDescription = "Post Image ${post.id}",
+                                modifier = Modifier
+                                    .aspectRatio(1f)
+                                    .clickable { onPostClick(post) },
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                     }
                 }
             }
