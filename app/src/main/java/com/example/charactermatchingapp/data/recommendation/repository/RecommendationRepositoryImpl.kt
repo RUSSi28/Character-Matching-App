@@ -12,10 +12,13 @@ import kotlinx.serialization.json.Json
 class RecommendationRepositoryImpl : RecommendationRepository {
 
     // ユーザーの指示とエラー内容に基づき、初期化方法を修正
-    private val model: GenerativeModel = Firebase.ai.generativeModel(
-        modelName = "gemini-2.5-flash", // ご要望のモデル名に変更
-        tools = listOf(Tool.googleSearch())
-    )
+    // テスト環境でのエラーを避けるため、lazy初期化に変更
+    private val model: GenerativeModel by lazy {
+        Firebase.ai.generativeModel(
+            modelName = "gemini-2.5-flash", // ご要望のモデル名に変更
+            tools = listOf(Tool.googleSearch())
+        )
+    }
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
@@ -50,8 +53,8 @@ JSON_END
 
             val recommendations = json.decodeFromString<List<Recommendation>>(jsonText.trim())
 
-            // ユーザーの調査結果に基づき、正しいパスから検索サジェストを取得する
-            val searchSuggestions = response.candidates.firstOrNull()?.groundingMetadata?.searchEntryPoint?.renderedContent
+            // groundingMetadata が API変更により存在しないため、一時的に無効化
+            val searchSuggestions = null
 
             val result = RecommendationResult(
                 recommendations = recommendations,
