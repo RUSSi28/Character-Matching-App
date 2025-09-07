@@ -11,10 +11,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -45,16 +50,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.charactermatchingapp.domain.recommendation.model.Recommendation
+import com.example.charactermatchingapp.ui.theme.ButtonTextColor
+import com.example.charactermatchingapp.ui.theme.MainColor
+import com.example.charactermatchingapp.ui.theme.TextMainColor
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun RecommendationScreen(viewModel: RecommendationViewModel = koinViewModel()) {
+fun RecommendationScreen(
+    viewModel: RecommendationViewModel = koinViewModel(),
+    windowInsets: WindowInsets = WindowInsets.safeDrawing
+) {
     val uiState by viewModel.uiState.collectAsState()
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF363636)),
+            .windowInsetsPadding(
+                insets = windowInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
+            )
+            .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         if (!uiState.hasStarted) {
@@ -68,7 +81,7 @@ fun RecommendationScreen(viewModel: RecommendationViewModel = koinViewModel()) {
                 uiState.error != null -> {
                     Text(
                         text = uiState.error!!,
-                        color = Color.White,
+                        color = TextMainColor,
                         modifier = Modifier.padding(16.dp)
                     )
                 }
@@ -92,7 +105,7 @@ private fun InitialView(onExecuteClick: () -> Unit) {
     ) {
         Text(
             text = "あなたがいいねしたタグ情報をもとに、Geminiがおすすめの漫画やアニメを提案します。",
-            color = Color.White,
+            color = TextMainColor,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge
         )
@@ -100,7 +113,10 @@ private fun InitialView(onExecuteClick: () -> Unit) {
         Button(
             onClick = onExecuteClick,
             shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A99CE))
+            colors = ButtonDefaults.buttonColors().copy(
+                containerColor = MainColor,
+                contentColor = ButtonTextColor
+            )
         ) {
             Text(text = "おすすめを実行", modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
         }

@@ -1,5 +1,7 @@
 package com.example.charactermatchingapp
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -15,7 +17,8 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun FavoriteScreenNavHost(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    windowInsets: WindowInsets = WindowInsets.safeDrawing,
 ) {
     NavHost(
         navController = navController,
@@ -24,11 +27,12 @@ fun FavoriteScreenNavHost(
         composable(AppDestinations.GALLERY_ROUTE) {
             val galleryViewModel: GalleryViewModel = koinViewModel()
             GalleryApp(
+                windowInsets = windowInsets,
                 galleryViewModel = galleryViewModel,
                 onItemClick = { authorId ->
                     val route = AppDestinations.ACCOUNT_ROUTE.replace("{${AppDestinations.ACCOUNT_ARG_AUTHOR_ID}}", authorId)
                     navController.navigate(route)
-                }
+                },
             )
         }
         // アカウント画面

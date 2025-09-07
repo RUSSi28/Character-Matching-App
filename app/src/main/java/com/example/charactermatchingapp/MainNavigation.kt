@@ -1,16 +1,15 @@
 package com.example.charactermatchingapp
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -19,7 +18,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
 import com.example.charactermatchingapp.presentation.SharedViewModel
 import com.example.charactermatchingapp.presentation.auth.AuthViewModel
 import com.example.charactermatchingapp.presentation.auth.LoginScreen
@@ -27,6 +25,7 @@ import com.example.charactermatchingapp.presentation.auth.SignUpScreen
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingViewModel
 import com.example.charactermatchingapp.presentation.recommendation.RecommendationScreen
+import com.example.charactermatchingapp.ui.theme.ContainerColor
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.Serializable
@@ -104,13 +103,15 @@ fun MainNavigation(
                 )
             }
         },
-        containerColor = Color(0xFF363636),
-        modifier = modifier
+        containerColor = ContainerColor,
+        modifier = modifier,
+        contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
         NavigationHost(
             navController = navController,
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier.fillMaxSize(),
         )
+        innerPadding
     }
 }
 

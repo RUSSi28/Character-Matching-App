@@ -13,10 +13,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountBox
@@ -42,6 +47,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.charactermatchingapp.ui.theme.BottomBarSubColor
+import com.example.charactermatchingapp.ui.theme.MainColor
+import com.example.charactermatchingapp.ui.theme.SubColor
 import dev.chrisbanes.haze.HazeDefaults
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
@@ -51,6 +59,7 @@ fun GlassmorphicBottomNavigation(
     currentTab: BottomNavigationTab,
     onItemClick: (Screen) -> Unit,
     hazeState: HazeState,
+    windowInsets: WindowInsets = WindowInsets.safeDrawing
 ) {
     val animatedSelectedTabIndex by animateFloatAsState(
         targetValue = currentTab.ordinal.toFloat(),
@@ -61,7 +70,7 @@ fun GlassmorphicBottomNavigation(
         )
     )
     val animatedColor by animateColorAsState(
-        targetValue = Color(0xFF4A99CE),
+        targetValue = MainColor,
         label = "animatedColor",
         animationSpec = spring(
             stiffness = Spring.StiffnessLow,
@@ -70,13 +79,18 @@ fun GlassmorphicBottomNavigation(
     )
     Box(
         modifier = Modifier
-            .padding(vertical = 24.dp, horizontal = 32.dp)
+            .windowInsetsPadding(
+                insets = windowInsets.only(
+                    WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
+                )
+            )
             .fillMaxWidth()
+            .padding(horizontal = 16.dp)
             .height(64.dp)
             .hazeEffect(
                 state = hazeState,
                 style = HazeDefaults.style(
-                    backgroundColor = MaterialTheme.colorScheme.background,
+                    backgroundColor = SubColor,
                     blurRadius = 10.dp,
                 )
             )
@@ -199,17 +213,17 @@ fun BottomNavigationItem(
             imageVector = icon,
             contentDescription = null,
             tint = if (selected) {
-                Color(0xFF4A99CE)
+                MainColor
             } else {
-                Color(0xFFD7D7D7)
+                BottomBarSubColor
             }
         )
         Text(
             text = label,
             color = if (selected) {
-                Color(0xFF4A99CE)
+                MainColor
             } else {
-                Color(0xFFD7D7D7)
+                BottomBarSubColor
             },
             fontSize = 12.sp,
             fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold

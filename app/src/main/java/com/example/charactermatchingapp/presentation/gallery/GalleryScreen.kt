@@ -1,5 +1,6 @@
 package com.example.charactermatchingapp.presentation.gallery
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -7,11 +8,15 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,9 +25,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,75 +39,82 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.charactermatchingapp.domain.gallery.model.GalleryItem
 import com.example.charactermatchingapp.ui.theme.CharacterMatchingAppTheme
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import coil.compose.AsyncImage
+import com.example.charactermatchingapp.ui.theme.SubColor
+import com.example.charactermatchingapp.ui.theme.SubContainerColor
+import com.example.charactermatchingapp.ui.theme.TextMainColor
+import com.example.charactermatchingapp.ui.theme.TextSubColor
 import com.google.firebase.Timestamp
 
 @Composable
-fun GalleryApp(modifier: Modifier = Modifier, galleryViewModel: GalleryViewModel = viewModel(), onItemClick: (String) -> Unit) {
+fun GalleryApp(
+    modifier: Modifier = Modifier,
+    galleryViewModel: GalleryViewModel = viewModel(),
+    onItemClick: (String) -> Unit,
+    windowInsets: WindowInsets,
+) {
     val galleryItems by galleryViewModel.galleryItems.collectAsState()
     val isLoading by galleryViewModel.isLoading.collectAsState()
     val canLoadNext by galleryViewModel.canLoadNext.collectAsState()
     val canLoadPrevious by galleryViewModel.canLoadPrevious.collectAsState()
 
     Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        GalleryItemList(
-            galleryItems = galleryItems,
-            onItemClick = { galleryItem ->
-                onItemClick(galleryItem.authorId)
-            },
-            modifier = Modifier.weight(1f) // Take available space
-        )
-
-        if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Button(
-                onClick = { galleryViewModel.loadPreviousPage() },
-                enabled = canLoadPrevious && !isLoading
-            ) {
-                Text("前へ")
-            }
-            Button(
-                onClick = { galleryViewModel.loadNextPage() },
-                enabled = canLoadNext && !isLoading
-            ) {
-                Text("次へ")
-            }
-        }
-    }
-}
-
-@Composable
-fun GalleryItemList(
-    galleryItems: List<GalleryItem>,
-    onItemClick: (GalleryItem) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    LazyColumn(
-        modifier = modifier,
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(galleryItems) { galleryItem ->
-            GalleryItemCard(
-                galleryItem = galleryItem,
-                onClick = { onItemClick(galleryItem) }
+        modifier = modifier
+            .windowInsetsPadding(
+                insets = windowInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
             )
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Crossfade(
+            targetState = isLoading
+        ) {
+            if (it) {
+                // CircularProgressIndicator()
+                // NavHost多重の影響かインジケーターの表示がバグるのでコメントアウト
+            } else {
+                LazyColumn(
+                    modifier = modifier,
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        items = galleryItems,
+                        key = { galleryItem -> galleryItem.artworkId }
+                    ) { galleryItem ->
+                        GalleryItemCard(
+                            galleryItem = galleryItem,
+                            onClick = { onItemClick(galleryItem.authorId) }
+                        )
+                    }
+                    item(key = "prev_and_next") {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .padding(bottom = 100.dp),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Button(
+                                onClick = { galleryViewModel.loadPreviousPage() },
+                                enabled = canLoadPrevious && !isLoading
+                            ) {
+                                Text("前へ")
+                            }
+                            Button(
+                                onClick = { galleryViewModel.loadNextPage() },
+                                enabled = canLoadNext && !isLoading
+                            ) {
+                                Text("次へ")
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -111,6 +125,9 @@ fun GalleryItemCard(galleryItem: GalleryItem, modifier: Modifier = Modifier, onC
     Card(
         onClick = onClick,
         modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = SubContainerColor
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -132,6 +149,7 @@ fun GalleryItemCard(galleryItem: GalleryItem, modifier: Modifier = Modifier, onC
                 Text(
                     text = galleryItem.characterName,
                     style = MaterialTheme.typography.titleLarge,
+                    color = TextMainColor,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
@@ -139,8 +157,9 @@ fun GalleryItemCard(galleryItem: GalleryItem, modifier: Modifier = Modifier, onC
                 Text(
                     text = galleryItem.authorName,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 4.dp, bottom = 8.dp))
+                    color = TextSubColor,
+                    modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
+                )
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -148,11 +167,12 @@ fun GalleryItemCard(galleryItem: GalleryItem, modifier: Modifier = Modifier, onC
                     galleryItem.tags.forEach { tag ->
                         Surface(
                             shape = MaterialTheme.shapes.small,
-                            color = MaterialTheme.colorScheme.secondaryContainer
+                            color = SubColor
                         ) {
                             Text(
                                 text = tag,
                                 style = MaterialTheme.typography.bodySmall,
+                                color = TextSubColor,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                             )
                         }
@@ -189,6 +209,9 @@ private fun GalleryItemCardPreview() {
 @Composable
 private fun GalleryAppPreview() {
     CharacterMatchingAppTheme {
-        GalleryApp(onItemClick = {})
+        GalleryApp(
+            windowInsets = WindowInsets.safeDrawing,
+            onItemClick = {}
+        )
     }
 }
