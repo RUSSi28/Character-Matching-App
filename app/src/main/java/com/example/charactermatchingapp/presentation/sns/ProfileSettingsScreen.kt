@@ -43,6 +43,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.charactermatchingapp.R
 import androidx.compose.material3.Surface
@@ -53,7 +54,7 @@ import androidx.compose.material3.TextFieldDefaults
 @Composable
 fun AccountSettingsScreen(
     accountId: String,
-    viewModel: AccountSettingsViewModel = viewModel(), // ViewModelを取得
+    viewModel: AccountSettingsViewModel = koinViewModel(), // ViewModelを取得
     onClick: () -> Unit
 ) {
     // ViewModelのUI状態を監視
@@ -120,7 +121,7 @@ fun AccountSettingsScreen(
                                 .clickable { headerLauncher.launch("image/*") },
                             contentAlignment = Alignment.Center
                         ) {
-                            if (uiState.headerImageUrl.isEmpty()) {
+                            if (uiState.headerImageUrl.isNullOrEmpty()) {
                                 Image(painter = painterResource(id = R.drawable.post_example2),
                                     contentDescription = "Header Placeholder",
                                     modifier = Modifier.fillMaxSize(),
@@ -154,7 +155,7 @@ fun AccountSettingsScreen(
                                 .clickable { iconLauncher.launch("image/*") },
                             contentAlignment = Alignment.Center
                         ) {
-                            if (uiState.iconImageUrl.isEmpty()) {
+                            if (uiState.iconImageUrl.isNullOrEmpty()) {
                                 Image(painter = painterResource(id = R.drawable.post_example2),
                                     contentDescription = "Icon Placeholder",
                                     modifier = Modifier.fillMaxSize(),
@@ -186,7 +187,7 @@ fun AccountSettingsScreen(
                                 color = MaterialTheme.colorScheme.primary
                                 )
                             OutlinedTextField(
-                                value = uiState.profileText,
+                                value = uiState.profileText ?: "", // Handle nullability for TextField
                                 onValueChange = viewModel::onProfileTextChange, // ViewModelの関数を呼び出す
                                 modifier = Modifier
                                     .fillMaxWidth()

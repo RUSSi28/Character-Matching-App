@@ -69,7 +69,7 @@ fun ProfileHeader(
                 painter = if (LocalInspectionMode.current) {
                     painterResource(id = R.drawable.post_example2)
                 } else {
-                    rememberAsyncImagePainter(model = profile.headerImageResId)
+                    rememberAsyncImagePainter(model = profile.headerImageUrl)
                 },
                 contentDescription = "Header Image",
                 modifier = Modifier
@@ -81,7 +81,7 @@ fun ProfileHeader(
                 painter = if (LocalInspectionMode.current) {
                     painterResource(id = R.drawable.post_example2)
                 } else {
-                    rememberAsyncImagePainter(model = profile.iconImageResId)
+                    rememberAsyncImagePainter(model = profile.iconImageUrl)
                 },
                 contentDescription = "Icon Image",
                 modifier = Modifier
@@ -100,7 +100,7 @@ fun ProfileHeader(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = profile.accountName,
+                text = profile.displayName,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
@@ -111,7 +111,7 @@ fun ProfileHeader(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = profile.profileText,
+                    text = profile.bio ?: "", // bio can be null
                     modifier = Modifier.fillMaxWidth(),
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center

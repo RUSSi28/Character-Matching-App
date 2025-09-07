@@ -5,13 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
 import com.example.charactermatchingapp.domain.matching.repository.CharacterMatchingRepository
+import com.example.charactermatchingapp.domain.auth.service.CurrentUserProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class CharacterMatchingViewModel(
-    private val characterMatchingRepository: CharacterMatchingRepository
+    private val characterMatchingRepository: CharacterMatchingRepository,
+    private val currentUserProvider: CurrentUserProvider
 ) : ViewModel() {
     private val _matchingCharacters = MutableStateFlow<List<CharacterInfo>>(emptyList())
     val matchingCharacters: StateFlow<List<CharacterInfo>> = _matchingCharacters.asStateFlow()
@@ -38,6 +40,15 @@ class CharacterMatchingViewModel(
     fun likeCharacterInfo(characterInfo: CharacterInfo) {
         viewModelScope.launch {
             characterMatchingRepository.likeCharacterInfo(characterInfo)
+            val userId = currentUserProvider.getCurrentUserId()
+            if (userId != null) {
+                val result = characterMatchingRepository.onCardLiked(userId, characterInfo.tags)
+                result.onSuccess {
+                    Log.d("CharacterMatchingViewModel", "likesTags updated successfully")
+                }.onFailure { e ->
+                    Log.e("CharacterMatchingViewModel", "Error updating likesTags", e)
+                }
+            }
             removeLastItem()
         }
     }

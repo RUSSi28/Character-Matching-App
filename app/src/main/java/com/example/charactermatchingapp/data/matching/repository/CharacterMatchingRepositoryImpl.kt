@@ -6,6 +6,7 @@ import com.example.charactermatchingapp.domain.auth.service.CurrentUserProvider
 import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
 import com.example.charactermatchingapp.domain.matching.repository.CharacterMatchingRepository
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.tasks.await
 
 class CharacterMatchingRepositoryImpl(
@@ -86,5 +87,17 @@ class CharacterMatchingRepositoryImpl(
 
     override fun dislikeCharacterInfo(characterInfo: CharacterInfo) {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun onCardLiked(userId: String, likedArtworkTags: List<String>): Result<Unit> {
+        return try {
+            firestore.collection("accounts").document(userId)
+                .update("likesTags", FieldValue.arrayUnion(*likedArtworkTags.toTypedArray()))
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("CharacterMatchingRepoImpl", "Error adding likesTags", e)
+            Result.failure(e)
+        }
     }
 }
