@@ -1,13 +1,21 @@
 package com.example.charactermatchingapp.presentation.auth
 
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,13 +48,21 @@ fun LoginScreen(
     uiState: AuthUiState,
     onLogin: (String, String) -> Unit,
     onNavigateToSignUp: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = WindowInsets.safeDrawing
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = modifier
+            .verticalScroll(scrollState)
+            .windowInsetsPadding(
+                insets = windowInsets.only(
+                    WindowInsetsSides.Top + WindowInsetsSides.Horizontal
+                )
+            )
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,

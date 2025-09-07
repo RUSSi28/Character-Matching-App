@@ -3,11 +3,18 @@ package com.example.charactermatchingapp.presentation.auth
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,21 +47,30 @@ fun SignUpScreen(
     uiState: AuthUiState,
     onSignUp: (String, String, String) -> Unit,
     onNavigateToLogin: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = WindowInsets.safeDrawing
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var displayName by remember { mutableStateOf("") }
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = modifier
+            .verticalScroll(scrollState)
+            .windowInsetsPadding(
+                insets = windowInsets.only(
+                    WindowInsetsSides.Top + WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
+                )
+            )
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(id = R.string.signup_title), style = MaterialTheme.typography.headlineMedium,
+            text = stringResource(id = R.string.signup_title),
+            style = MaterialTheme.typography.headlineMedium,
             color = TextMainColor
         )
         Spacer(modifier = Modifier.height(32.dp))

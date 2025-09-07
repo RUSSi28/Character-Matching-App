@@ -1,6 +1,8 @@
 package com.example.charactermatchingapp
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -106,11 +108,12 @@ fun MainNavigation(
             }
         },
         containerColor = ContainerColor,
-        modifier = modifier
+        modifier = modifier,
+        contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
         NavigationHost(
             navController = navController,
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier.fillMaxSize(),
         )
     }
 }

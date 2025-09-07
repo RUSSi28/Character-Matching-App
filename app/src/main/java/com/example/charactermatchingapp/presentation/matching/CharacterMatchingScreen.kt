@@ -7,10 +7,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -45,6 +50,7 @@ fun CharacterMatchingScreen(
     onItemsSwipedRight: (CharacterInfo) -> Unit,
     onItemsSwipedUp: (CharacterInfo) -> Unit,
     onItemsSwipedLeft: (CharacterInfo) -> Unit,
+    windowInsets: WindowInsets = WindowInsets.safeDrawing
 ) {
     Crossfade(
         targetState = isLoading
@@ -55,7 +61,13 @@ fun CharacterMatchingScreen(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(
+                    modifier = Modifier.windowInsetsPadding(
+                        insets = windowInsets.only(
+                            WindowInsetsSides.Bottom + WindowInsetsSides.Top + WindowInsetsSides.Horizontal
+                        )
+                    )
+                )
             }
         } else {
             var sizeNo by remember { mutableFloatStateOf(20f) }
@@ -92,6 +104,12 @@ fun CharacterMatchingScreen(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = modifier
+                    .windowInsetsPadding(
+                        insets = windowInsets.only(
+                            WindowInsetsSides.Bottom + WindowInsetsSides.Top + WindowInsetsSides.Horizontal
+                        )
+                    )
+                    .fillMaxSize()
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
