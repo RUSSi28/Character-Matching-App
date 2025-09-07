@@ -242,6 +242,6 @@ private fun NavigationHost(
         composable<Screen.Recommend> {
             RecommendationScreen()
         }
-        
+
     }
 }
