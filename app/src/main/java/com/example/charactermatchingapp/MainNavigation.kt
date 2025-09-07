@@ -30,6 +30,8 @@ import com.example.charactermatchingapp.presentation.auth.SignUpScreen
 import com.example.charactermatchingapp.presentation.gallery.GalleryApp
 import com.example.charactermatchingapp.presentation.gallery.GalleryViewModel
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
+import com.example.charactermatchingapp.presentation.post.CharacterPostScreen
+import com.example.charactermatchingapp.presentation.post.PostViewModel
 import com.example.charactermatchingapp.presentation.recommendation.RecommendationScreen
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
@@ -122,7 +124,6 @@ fun MainNavigation(
             modifier = Modifier.padding(innerPadding),
             snackbarHostState = snackbarHostState,
             scope = scope
-
         )
     }
 }
@@ -228,8 +229,6 @@ private fun NavigationHost(
             )
         }
         composable<Screen.Gallery> {
-            //お気に入り画面に遷移する
-            //FavoriteScreenNavHost("NjMe4XK8J4rm9f4ogvEj")
             val galleryViewModel: GalleryViewModel = koinViewModel()
             GalleryApp(galleryViewModel = galleryViewModel)
         }
@@ -243,5 +242,6 @@ private fun NavigationHost(
         composable<Screen.Recommend> {
             RecommendationScreen()
         }
+        
     }
 }
