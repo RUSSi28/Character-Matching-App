@@ -30,14 +30,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
+import com.example.charactermatchingapp.presentation.SharedViewModel
 import com.example.charactermatchingapp.presentation.auth.AuthViewModel
 import com.example.charactermatchingapp.presentation.auth.LoginScreen
 import com.example.charactermatchingapp.presentation.auth.SignUpScreen
 import com.example.charactermatchingapp.presentation.gallery.GalleryApp
 import com.example.charactermatchingapp.presentation.gallery.GalleryViewModel
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
-import com.example.charactermatchingapp.presentation.post.CharacterPostScreen
-import com.example.charactermatchingapp.presentation.post.PostViewModel
+import com.example.charactermatchingapp.presentation.recommendation.RecommendationScreen
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
@@ -56,7 +56,7 @@ sealed class Screen(val route: String) {
     data object Home : Screen("home")
 
     @Serializable
-    data object Settings : Screen("settings")
+    data object Recommend : Screen("recommend")
 
     @Serializable
     data object Login : Screen("login")
@@ -69,7 +69,7 @@ private val bottomNavigationAllowedScreen = setOf(
     Screen.Matching,
     Screen.Gallery,
     Screen.Home,
-    Screen.Settings
+    Screen.Recommend
 )
 
 fun NavDestination.toBottomNavigationTab(): BottomNavigationTab {
@@ -77,7 +77,7 @@ fun NavDestination.toBottomNavigationTab(): BottomNavigationTab {
         hasRoute(Screen.Matching::class) -> BottomNavigationTab.Matching
         hasRoute(Screen.Gallery::class) -> BottomNavigationTab.Gallery
         hasRoute(Screen.Home::class) -> BottomNavigationTab.Home
-        hasRoute(Screen.Settings::class) -> BottomNavigationTab.Settings
+        hasRoute(Screen.Recommend::class) -> BottomNavigationTab.Recommend
         else -> BottomNavigationTab.Matching
     }
 }
@@ -230,8 +230,8 @@ private fun NavigationHost(
             }
             SignUpScreen(
                 uiState = authUiState,
-                onSignUp = { email, password ->
-                    authViewModel.signUp(email, password)
+                onSignUp = { email, password, displayName ->
+                    authViewModel.signUp(email, password, displayName)
                 },
                 onNavigateToLogin = {
                     navController.navigate(Screen.Login)
@@ -247,11 +247,17 @@ private fun NavigationHost(
             )
         }
         composable<Screen.Gallery> {
+            //お気に入り画面に遷移する
+            //FavoriteScreenNavHost("NjMe4XK8J4rm9f4ogvEj")
             val galleryViewModel: GalleryViewModel = koinViewModel()
             GalleryApp(galleryViewModel = galleryViewModel)
         }
         composable<Screen.Home> {
-
+            val sharedViewModel: SharedViewModel = koinViewModel()
+            val userId = sharedViewModel.currentUserProvider.getCurrentUserId()
+            if (userId != null) {
+                PosterViewScreenNavHost(userId)
+            }
         }
         composable<Screen.Settings> {
             val postViewModel: PostViewModel = koinViewModel()
@@ -267,6 +273,8 @@ private fun NavigationHost(
                 }
             )
 
+        composable<Screen.Recommend> {
+            RecommendationScreen()
         }
     }
 }

@@ -2,8 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0"
     id("com.google.gms.google-services")
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0"
 }
 
 android {
@@ -38,6 +38,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -54,12 +55,25 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.kotlinx.collections.immutable)
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    // Pagingの基本ライブラリ
+    implementation("androidx.paging:paging-runtime-ktx:3.3.0")
+    // Jetpack ComposeでPagingを使うためのライブラリ
+    implementation("androidx.paging:paging-compose:3.3.0")
+    // ViewModelをComposeで簡単に使うためのライブラリ
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+    implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation(libs.haze)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.accompanist.systemuicontroller)
     implementation("com.google.accompanist:accompanist-flowlayout:0.36.0")
     implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
+    implementation("com.google.firebase:firebase-ai")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
