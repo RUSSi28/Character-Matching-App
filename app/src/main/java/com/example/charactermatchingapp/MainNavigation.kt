@@ -25,6 +25,7 @@ import com.example.charactermatchingapp.presentation.auth.AuthViewModel
 import com.example.charactermatchingapp.presentation.auth.LoginScreen
 import com.example.charactermatchingapp.presentation.auth.SignUpScreen
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
+import com.example.charactermatchingapp.presentation.recommendation.RecommendationScreen
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.Serializable
@@ -42,7 +43,7 @@ sealed class Screen(val route: String) {
     data object Home : Screen("home")
 
     @Serializable
-    data object Settings : Screen("settings")
+    data object Recommend : Screen("recommend")
 
     @Serializable
     data object Login : Screen("login")
@@ -55,7 +56,7 @@ private val bottomNavigationAllowedScreen = setOf(
     Screen.Matching,
     Screen.Gallery,
     Screen.Home,
-    Screen.Settings
+    Screen.Recommend
 )
 
 fun NavDestination.toBottomNavigationTab(): BottomNavigationTab {
@@ -63,7 +64,7 @@ fun NavDestination.toBottomNavigationTab(): BottomNavigationTab {
         hasRoute(Screen.Matching::class) -> BottomNavigationTab.Matching
         hasRoute(Screen.Gallery::class) -> BottomNavigationTab.Gallery
         hasRoute(Screen.Home::class) -> BottomNavigationTab.Home
-        hasRoute(Screen.Settings::class) -> BottomNavigationTab.Settings
+        hasRoute(Screen.Recommend::class) -> BottomNavigationTab.Recommend
         else -> BottomNavigationTab.Matching
     }
 }
@@ -224,12 +225,8 @@ private fun NavigationHost(
                 PosterViewScreenNavHost(userId)
             }
         }
-        composable<Screen.Settings> {
-            //val postViewModel: PostViewModel = koinViewModel()
-
-            //CharacterPostScreen(onPost = { postInfo ->
-            //postViewModel.savePost(postInfo)
-            //})
+        composable<Screen.Recommend> {
+            RecommendationScreen()
         }
     }
 }
