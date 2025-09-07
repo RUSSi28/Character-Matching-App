@@ -22,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountBox
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.PhotoLibrary
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -115,12 +114,6 @@ fun GlassmorphicBottomNavigation(
                 label = "Home",
                 selected = currentTab == BottomNavigationTab.Home,
                 onClick = { onItemClick(Screen.Home) },
-            )
-            BottomNavigationItem(
-                icon = Icons.Rounded.Settings,
-                label = "Settings",
-                selected = currentTab == BottomNavigationTab.Settings,
-                onClick = { onItemClick(Screen.Settings) },
             )
             BottomNavigationItem(
                 icon = Icons.Outlined.Lightbulb,
@@ -228,6 +221,5 @@ enum class BottomNavigationTab {
     Matching,
     Gallery,
     Home,
-    Settings,
     Recommend,
 }
