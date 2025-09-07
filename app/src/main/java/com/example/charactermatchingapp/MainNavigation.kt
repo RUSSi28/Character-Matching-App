@@ -1,4 +1,5 @@
 package com.example.charactermatchingapp
+
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -41,23 +42,30 @@ import org.koin.androidx.compose.koinViewModel
 sealed class Screen(val route: String) {
     @Serializable
     data object Matching : Screen("matching")
+
     @Serializable
     data object Gallery : Screen("gallery")
+
     @Serializable
     data object Home : Screen("home")
+
     @Serializable
     data object Settings : Screen("settings")
+
     @Serializable
     data object Login : Screen("login")
+
     @Serializable
     data object SignUp : Screen("signup")
 }
+
 private val bottomNavigationAllowedScreen = setOf(
     Screen.Matching,
     Screen.Gallery,
     Screen.Home,
     Screen.Settings
 )
+
 fun NavDestination.toBottomNavigationTab(): BottomNavigationTab {
     return when {
         hasRoute(Screen.Matching::class) -> BottomNavigationTab.Matching
@@ -67,6 +75,7 @@ fun NavDestination.toBottomNavigationTab(): BottomNavigationTab {
         else -> BottomNavigationTab.Matching
     }
 }
+
 @SuppressLint("RestrictedApi")
 @Composable
 fun MainNavigation(
@@ -116,6 +125,7 @@ fun MainNavigation(
         )
     }
 }
+
 @Composable
 private fun NavigationHost(
     navController: NavHostController,
@@ -163,6 +173,7 @@ private fun NavigationHost(
         composable<Screen.Login> {
             val authViewModel: AuthViewModel = koinViewModel()
             val authUiState by authViewModel.uiState.collectAsState()
+
             LaunchedEffect(authUiState.isLoginSuccess) {
                 if (authUiState.isLoginSuccess) {
                     navController.navigate(Screen.Matching) {
@@ -186,6 +197,7 @@ private fun NavigationHost(
         composable<Screen.SignUp> {
             val authViewModel: AuthViewModel = koinViewModel()
             val authUiState by authViewModel.uiState.collectAsState()
+
             LaunchedEffect(authUiState.isSignUpSuccess) {
                 if (authUiState.isSignUpSuccess) {
                     navController.navigate(Screen.Matching) {
@@ -219,9 +231,11 @@ private fun NavigationHost(
             GalleryApp(galleryViewModel = galleryViewModel)
         }
         composable<Screen.Home> {
+
         }
         composable<Screen.Settings> {
             val postViewModel: PostViewModel = koinViewModel()
+
             CharacterPostScreen(
                 modifier = modifier, // Pass the modifier here
                 onPost = { postInfo ->
