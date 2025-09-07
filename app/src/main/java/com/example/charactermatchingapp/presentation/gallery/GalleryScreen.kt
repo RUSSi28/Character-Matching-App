@@ -1,5 +1,6 @@
 package com.example.charactermatchingapp.presentation.gallery
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -65,42 +66,51 @@ fun GalleryApp(
                 insets = windowInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
             )
             .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        if (isLoading) {
-            CircularProgressIndicator()
-        } else {
-            LazyColumn(
-                modifier = modifier,
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(galleryItems) { galleryItem ->
-                    GalleryItemCard(
-                        galleryItem = galleryItem,
-                        onClick = { onItemClick(galleryItem.authorId) }
-                    )
-                }
-                item(key = "prev_and_next") {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .padding(bottom = 100.dp),
-                        horizontalArrangement = Arrangement.SpaceAround,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Button(
-                            onClick = { galleryViewModel.loadPreviousPage() },
-                            enabled = canLoadPrevious && !isLoading
+        Crossfade(
+            targetState = isLoading
+        ) {
+            if (it) {
+                // CircularProgressIndicator()
+                // NavHost多重の影響かインジケーターの表示がバグるのでコメントアウト
+            } else {
+                LazyColumn(
+                    modifier = modifier,
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        items = galleryItems,
+                        key = { galleryItem -> galleryItem.artworkId }
+                    ) { galleryItem ->
+                        GalleryItemCard(
+                            galleryItem = galleryItem,
+                            onClick = { onItemClick(galleryItem.authorId) }
+                        )
+                    }
+                    item(key = "prev_and_next") {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .padding(bottom = 100.dp),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("前へ")
-                        }
-                        Button(
-                            onClick = { galleryViewModel.loadNextPage() },
-                            enabled = canLoadNext && !isLoading
-                        ) {
-                            Text("次へ")
+                            Button(
+                                onClick = { galleryViewModel.loadPreviousPage() },
+                                enabled = canLoadPrevious && !isLoading
+                            ) {
+                                Text("前へ")
+                            }
+                            Button(
+                                onClick = { galleryViewModel.loadNextPage() },
+                                enabled = canLoadNext && !isLoading
+                            ) {
+                                Text("次へ")
+                            }
                         }
                     }
                 }
