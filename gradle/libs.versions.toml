@@ -1,5 +1,6 @@
 [versions]
 accompanistSystemuicontroller = "0.36.0"
+generativeai = "0.9.0"
 agp = "8.11.1"
 haze = "1.6.10"
 kotlin = "2.2.0"
@@ -19,6 +20,7 @@ googleServices = "4.4.3"
 [libraries]
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+generativeai = { module = "com.google.ai.client.generativeai:generativeai", version.ref = "generativeai" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

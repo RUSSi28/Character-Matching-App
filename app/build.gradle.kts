@@ -1,3 +1,4 @@
+import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -16,6 +17,17 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+        val localProperties = Properties()
+        val localFile = rootProject.file("local.properties")
+        if (localFile.exists()) {
+            localFile.inputStream().use { localProperties.load(it) }
+        }
+
+        buildConfigField(
+            "String",
+            "GEMINI_API_KEY",
+            "\"${localProperties["GEMINI_API_KEY"]}\""
+        )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -38,6 +50,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -78,6 +91,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("io.insert-koin:koin-android:4.1.1")
     implementation("io.insert-koin:koin-androidx-compose:4.1.1")
+    implementation(libs.generativeai)
     testImplementation("io.insert-koin:koin-test:3.5.3")
     testImplementation("io.insert-koin:koin-test-junit4:3.5.3")
     testImplementation("io.mockk:mockk:1.13.8")
