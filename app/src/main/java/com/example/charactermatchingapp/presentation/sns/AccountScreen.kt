@@ -46,40 +46,35 @@ fun AccountScreen(
     //val posts = viewModel.posts.collectAsLazyPagingItems()
     val posts = viewModel.postsFlow.collectAsLazyPagingItems()
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background // テーマで定義された背景色（通常は白）を適用
-    ){
-        profile?.let {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.fillMaxSize(),            verticalArrangement = Arrangement.spacedBy(1.dp),
-                horizontalArrangement = Arrangement.spacedBy(1.dp)
-            ) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Column {
-                        ProfileHeader(profile = it, onBackClick = onClick)
-                    }
+    profile?.let {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.fillMaxSize(),            verticalArrangement = Arrangement.spacedBy(1.dp),
+            horizontalArrangement = Arrangement.spacedBy(1.dp)
+        ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Column {
+                    ProfileHeader(profile = it, onBackClick = onClick)
                 }
-                items(
-                    count = posts.itemCount,
-                    key = { index -> posts[index]?.id ?: index }
-                ) { index ->
-                    val post = posts[index]
-                    if (post != null) {
-                        Image(
-                            painter = if (LocalInspectionMode.current) {
-                                painterResource(id = R.drawable.post_example)
-                            } else {
-                                rememberAsyncImagePainter(model = post.postImageResId)
-                            },
-                            contentDescription = "Post Image ${post.id}",
-                            modifier = Modifier
-                                .aspectRatio(1f)
-                                .clickable { onPostClick(post) },
-                            contentScale = ContentScale.Crop
-                        )
-                    }
+            }
+            items(
+                count = posts.itemCount,
+                key = { index -> posts[index]?.id ?: index }
+            ) { index ->
+                val post = posts[index]
+                if (post != null) {
+                    Image(
+                        painter = if (LocalInspectionMode.current) {
+                            painterResource(id = R.drawable.post_example)
+                        } else {
+                            rememberAsyncImagePainter(model = post.postImageResId)
+                        },
+                        contentDescription = "Post Image ${post.id}",
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .clickable { onPostClick(post) },
+                        contentScale = ContentScale.Crop
+                    )
                 }
             }
         }

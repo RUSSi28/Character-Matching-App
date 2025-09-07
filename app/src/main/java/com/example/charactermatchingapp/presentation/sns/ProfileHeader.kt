@@ -44,24 +44,6 @@ fun ProfileHeader(
     onBackClick: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        // トップバー
-        TopAppBar(
-            title = { Text("アカウント") },
-            // ★★★ ここで左矢印の戻るボタンを実装 ★★★
-            navigationIcon = {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "戻る"
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = Color.White,
-                navigationIconContentColor = Color.White
-            )
-        )
 
         // ヘッダー画像とプロフィール情報
         Box(modifier = Modifier.fillMaxWidth()) {

@@ -78,46 +78,19 @@ fun TimelineScreen(
             lazyListState.scrollToItem(initialIndex)
         }
     }
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background // テーマで定義された背景色（通常は白）を適用
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize(),
+        state = lazyListState
     ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("投稿") },
-                    navigationIcon = {
-                        IconButton(onClick = onClick) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "戻る"
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = Color.White,
-                        navigationIconContentColor = Color.White
-                    )
-                )
-            }
-        ) { paddingValues ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                state = lazyListState
-            ) {
-                items(
-                    count = posts.itemCount,
-                    key = { index -> posts.peek(index)?.id ?: index } // 各アイテムを区別するためのキー
-                ) { index ->
-                    val post = posts[index]
-                    if (post != null) {
-                        PostItemScreen(post)
-                        HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
-                    }
-                }
+        items(
+            count = posts.itemCount,
+            key = { index -> posts.peek(index)?.id ?: index } // 各アイテムを区別するためのキー
+        ) { index ->
+            val post = posts[index]
+            if (post != null) {
+                PostItemScreen(post)
+                HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
             }
         }
     }
