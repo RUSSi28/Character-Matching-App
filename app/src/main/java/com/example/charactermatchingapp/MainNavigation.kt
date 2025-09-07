@@ -3,12 +3,15 @@ package com.example.charactermatchingapp
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavDestination
@@ -25,10 +28,16 @@ import com.example.charactermatchingapp.presentation.auth.AuthViewModel
 import com.example.charactermatchingapp.presentation.auth.LoginScreen
 import com.example.charactermatchingapp.presentation.auth.SignUpScreen
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
+import com.example.charactermatchingapp.presentation.post.CharacterPostScreen
+import com.example.charactermatchingapp.presentation.post.PostViewModel
+
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingViewModel
+
 import com.example.charactermatchingapp.presentation.recommendation.RecommendationScreen
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 
@@ -85,7 +94,11 @@ fun MainNavigation(
     }
 
     val hazeState = rememberHazeState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             if (isBottomNavigationShown) {
                 GlassmorphicBottomNavigation(
@@ -110,6 +123,8 @@ fun MainNavigation(
         NavigationHost(
             navController = navController,
             modifier = Modifier.padding(innerPadding),
+            snackbarHostState = snackbarHostState,
+            scope = scope
         )
     }
 }
@@ -118,8 +133,41 @@ fun MainNavigation(
 private fun NavigationHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState,
+    scope: CoroutineScope
 ) {
     val startDestination = Screen.Login
+    val scope = rememberCoroutineScope()
+
+    // TODO(): リモートからデータを読み込めるようにして消す
+    val items = remember {
+        mutableStateListOf(
+            CharacterInfo(
+                id = "1",
+                name = "Character 1",
+                image = "https://example.com/image1.jpg",
+                description = "Description for Character 1",
+                tags = listOf("優しい", "天真爛漫"),
+                contributor = "Contributor 1"
+            ),
+            CharacterInfo(
+                id = "2",
+                name = "Character 2",
+                image = "https://example.com/image2.jpg",
+                description = "Description for Character 2",
+                tags = listOf("根暗", "リスカ", "眼帯", "デコラ風", "優しい"),
+                contributor = "Contributor 1"
+            ),
+            CharacterInfo(
+                id = "3",
+                name = "Character 3",
+                image = "https://example.com/image3.jpg",
+                description = "Description for Character 3",
+                tags = listOf("あほ", "明るい"),
+                contributor = "Contributor 2"
+            )
+        )
+    }
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -192,12 +240,17 @@ private fun NavigationHost(
             )
         }
         composable<Screen.Gallery> {
+
+            val galleryViewModel: GalleryViewModel = koinViewModel()
+            GalleryApp(galleryViewModel = galleryViewModel)
+
             //お気に入り画面に遷移する
             val sharedViewModel: SharedViewModel = koinViewModel()
             val userId = sharedViewModel.currentUserProvider.getCurrentUserId()
             if (userId != null) {
                 FavoriteScreenNavHost()
             }
+
         }
         composable<Screen.Home> {
             val sharedViewModel: SharedViewModel = koinViewModel()
@@ -209,5 +262,6 @@ private fun NavigationHost(
         composable<Screen.Recommend> {
             RecommendationScreen()
         }
+
     }
 }
