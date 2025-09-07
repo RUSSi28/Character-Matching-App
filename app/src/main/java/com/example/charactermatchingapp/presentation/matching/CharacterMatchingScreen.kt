@@ -1,12 +1,13 @@
 package com.example.charactermatchingapp.presentation.matching
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,9 +16,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,6 +32,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
+import com.google.firebase.Timestamp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.abs
@@ -37,127 +41,139 @@ import kotlin.math.abs
 fun CharacterMatchingScreen(
     modifier: Modifier = Modifier,
     items: ImmutableList<CharacterInfo>,
-    onItemsDrop: () -> Unit,
+    isLoading: Boolean,
+    onItemsSwipedRight: (CharacterInfo) -> Unit,
+    onItemsSwipedUp: (CharacterInfo) -> Unit,
+    onItemsSwipedLeft: (CharacterInfo) -> Unit,
 ) {
-    var sizeNo by remember { mutableFloatStateOf(20f) }
-    var sizeBookmark by remember { mutableFloatStateOf(20f) }
-    var sizeGood by remember { mutableFloatStateOf(20f) }
-    // 視覚的にわかりやすくするための判定用
-    var dragX by remember { mutableFloatStateOf(0f) }
-    var dragY by remember { mutableFloatStateOf(0f) }
-    when {
-        (abs(dragX) < abs(dragY)) && (dragY < -100 && (abs(dragY) > -1000)) -> {
-            sizeNo = 16f
-            sizeBookmark = 24f
-            sizeGood = 16f
-        }
-
-        (abs(dragX) > abs(dragY)) && (abs(dragX) > 100 && (abs(dragX) < 1000)) -> {
-            if (dragX > 0) {
-                sizeNo = 16f
-                sizeBookmark = 16f
-                sizeGood = 24f
-            } else {
-                sizeNo = 24f
-                sizeBookmark = 16f
-                sizeGood = 16f
+    Crossfade(
+        targetState = isLoading
+    ) { isLoading ->
+        if (isLoading) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                CircularProgressIndicator()
             }
-        }
+        } else {
+            var sizeNo by remember { mutableFloatStateOf(20f) }
+            var sizeBookmark by remember { mutableFloatStateOf(20f) }
+            var sizeGood by remember { mutableFloatStateOf(20f) }
+            // 視覚的にわかりやすくするための判定用
+            var dragX by remember { mutableFloatStateOf(0f) }
+            var dragY by remember { mutableFloatStateOf(0f) }
+            when {
+                (abs(dragX) < abs(dragY)) && (dragY < -100 && (abs(dragY) > -1000)) -> {
+                    sizeNo = 16f
+                    sizeBookmark = 24f
+                    sizeGood = 16f
+                }
 
-        else -> {
-            sizeNo = 20f
-            sizeBookmark = 20f
-            sizeGood = 20f
-        }
-    }
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-    ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp)
-        ) {
-            items.forEachIndexed { index, item ->
-                if (index == items.lastIndex || index == items.lastIndex - 1) {
-                    DraggableCard(
-                        characterInfo = item,
-                        cardWidth = 350.dp,
-                        cardHeight = 520.dp,
-                        onSwiped = {
-                            onItemsDrop()
-                            dragX = 0f
-                            dragY = 0f
-                        },
-                        onDragProgress = { x, y ->
-                            dragX = x
-                            dragY = y
-                        },
+                (abs(dragX) > abs(dragY)) && (abs(dragX) > 100 && (abs(dragX) < 1000)) -> {
+                    if (dragX > 0) {
+                        sizeNo = 16f
+                        sizeBookmark = 16f
+                        sizeGood = 24f
+                    } else {
+                        sizeNo = 24f
+                        sizeBookmark = 16f
+                        sizeGood = 16f
+                    }
+                }
+
+                else -> {
+                    sizeNo = 20f
+                    sizeBookmark = 20f
+                    sizeGood = 20f
+                }
+            }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = modifier
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp)
+                ) {
+                    items.forEachIndexed { index, item ->
+                        key(item.id) {
+                            if (index == items.lastIndex || index == items.lastIndex - 1) {
+                                DraggableCard(
+                                    characterInfo = item,
+                                    onSwipedRight = { characterInfo ->
+                                        onItemsSwipedRight(characterInfo)
+                                        dragX = 0f
+                                        dragY = 0f
+                                    },
+                                    onSwipedUp = { characterInfo ->
+                                        onItemsSwipedUp(characterInfo)
+                                        dragX = 0f
+                                        dragY = 0f
+                                    },
+                                    onSwipedLeft = { characterInfo ->
+                                        onItemsSwipedLeft(characterInfo)
+                                        dragX = 0f
+                                        dragY = 0f
+                                    },
+                                    onDragProgress = { x, y ->
+                                        dragX = x
+                                        dragY = y
+                                    },
+                                )
+                            }
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.size(16.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    // clickableにはonSwipedと同じ処理を渡す
+                    Icon(
+                        painter = rememberVectorPainter(Icons.Default.Close),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(
+                                color = if (sizeNo == 16f)
+                                    Color.LightGray else
+                                    Color(0xFFFF4D4D),
+                            )
+                            .padding(sizeNo.dp)
+                    )
+                    Icon(
+                        painter = rememberVectorPainter(Icons.Default.Star),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(
+                                color = if (sizeBookmark == 16f)
+                                    Color.LightGray else
+                                    Color(0xFF4D7AFF),
+                            )
+                            .padding(sizeBookmark.dp)
+                    )
+                    Icon(
+                        painter = rememberVectorPainter(Icons.Default.Favorite),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(
+                                color = if (sizeGood == 16f)
+                                    Color.LightGray else
+                                    Color(0xFF6AE354),
+                            )
+                            .padding(sizeGood.dp)
                     )
                 }
             }
-        }
-        Spacer(modifier = Modifier.size(16.dp))
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            // clickableにはonSwipedと同じ処理を渡す
-            Icon(
-                painter = rememberVectorPainter(Icons.Default.Close),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .clickable {
-                        onItemsDrop()
-                        dragX = 0f
-                        dragY = 0f
-                    }
-                    .background(
-                        color = if (sizeNo == 16f)
-                            Color.LightGray else
-                            Color(0xFFFF4D4D),
-                    )
-                    .padding(sizeNo.dp)
-            )
-            Icon(
-                painter = rememberVectorPainter(Icons.Default.Star),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .clickable {
-                        onItemsDrop()
-                        dragX = 0f
-                        dragY = 0f
-                    }
-                    .background(
-                        color = if (sizeBookmark == 16f)
-                            Color.LightGray else
-                            Color(0xFF4D7AFF),
-                    )
-                    .padding(sizeBookmark.dp)
-            )
-            Icon(
-                painter = rememberVectorPainter(Icons.Default.Favorite),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .clickable {
-                        onItemsDrop()
-                        dragX = 0f
-                        dragY = 0f
-                    }
-                    .background(
-                        color = if (sizeGood == 16f)
-                            Color.LightGray else
-                            Color(0xFF6AE354),
-                    )
-                    .padding(sizeGood.dp)
-            )
         }
     }
 }
@@ -173,7 +189,9 @@ private fun CharacterMatchingScreenPreview() {
                 image = "https://example.com/image1.jpg",
                 description = "Description for Character 1",
                 tags = listOf("優しい", "天真爛漫"),
-                contributor = "Contributor 1"
+                userName = "Contributor 1",
+                likes = 10,
+                postedAt = Timestamp.now()
             ),
             CharacterInfo(
                 id = "2",
@@ -181,7 +199,9 @@ private fun CharacterMatchingScreenPreview() {
                 image = "https://example.com/image2.jpg",
                 description = "Description for Character 2",
                 tags = listOf("根暗", "リスカ", "眼帯", "デコラ風", "優しい"),
-                contributor = "Contributor 1"
+                userName = "Contributor 1",
+                likes = 5,
+                postedAt = Timestamp.now()
             ),
             CharacterInfo(
                 id = "3",
@@ -189,9 +209,14 @@ private fun CharacterMatchingScreenPreview() {
                 image = "https://example.com/image3.jpg",
                 description = "Description for Character 3",
                 tags = listOf("あほ", "明るい"),
-                contributor = "Contributor 2"
+                userName = "Contributor 2",
+                likes = 15,
+                postedAt = Timestamp.now()
             )
         ).toImmutableList(),
-        onItemsDrop = {}
+        isLoading = false,
+        onItemsSwipedRight = {},
+        onItemsSwipedUp = {},
+        onItemsSwipedLeft = {},
     )
 }

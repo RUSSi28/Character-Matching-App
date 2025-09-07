@@ -2,7 +2,6 @@ package com.example.charactermatchingapp.presentation.matching
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -36,14 +36,19 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.charactermatchingapp.domain.matching.model.CharacterInfo
+import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -51,9 +56,9 @@ import kotlin.math.roundToInt
 @Composable
 fun DraggableCard(
     characterInfo: CharacterInfo,
-    cardWidth: Dp = 350.dp,
-    cardHeight: Dp = 520.dp,
-    onSwiped: () -> Unit,
+    onSwipedRight: (CharacterInfo) -> Unit,
+    onSwipedUp: (CharacterInfo) -> Unit,
+    onSwipedLeft: (CharacterInfo) -> Unit,
     modifier: Modifier = Modifier,
     onDragProgress: (Float, Float) -> Unit = { _, _ -> },
 ) {
@@ -66,6 +71,9 @@ fun DraggableCard(
         }
     }
     var textHeight by remember { mutableFloatStateOf(0f) }
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp
+    val cardHeight = screenHeight * 3 / 5
     LaunchedEffect(animX.value, animY.value) {
         onDragProgress(animX.value, animY.value)
     }
@@ -73,6 +81,9 @@ fun DraggableCard(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFADADAD)),
         modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .height(height = cardHeight.dp)
             .offset {
                 IntOffset(animX.value.roundToInt(), animY.value.roundToInt())
             }
@@ -99,12 +110,17 @@ fun DraggableCard(
 
                             when {
                                 abs(currentX) > swipeThresholdX -> {
-                                    val targetX = if (currentX > 0) 1200f else -1200f
+                                    val targetX = if (currentX > 0) {
+                                        onSwipedRight(characterInfo)
+                                        2000f
+                                    } else {
+                                        onSwipedLeft(characterInfo)
+                                        -2000f
+                                    }
                                     animX.animateTo(
                                         targetValue = targetX,
                                         animationSpec = spring()
                                     )
-                                    onSwiped()
                                 }
 
                                 currentY < swipeThresholdY -> {
@@ -112,7 +128,7 @@ fun DraggableCard(
                                         targetValue = -4000f,
                                         animationSpec = spring()
                                     )
-                                    onSwiped()
+                                    onSwipedUp(characterInfo)
                                 }
 
                                 else -> {
@@ -136,15 +152,21 @@ fun DraggableCard(
                     }
                 )
             }
-            .size(cardWidth, cardHeight),
     ) {
         Box(
             modifier = Modifier.fillMaxWidth()
         ) {
-            // TODO(): リモートから画像を読み込めるようにする
-            Image(
-                painter = ColorPainter(color = Color(0xFFADADAD)),
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(characterInfo.image)
+                    .crossfade(true)
+                    .build(),
+                placeholder = ColorPainter(color = Color(0xFFADADAD)),
+                error = ColorPainter(color = Color(0xFFADADAD)),
                 contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
             )
             Box(
                 modifier = Modifier
@@ -171,7 +193,6 @@ fun DraggableCard(
                         .align(Alignment.BottomStart)
                         .padding(16.dp)
                         .onGloballyPositioned {
-                            // 動かしたら再描画が走るので死ぬほど呼び出されてしまう
                             textHeight = it.size.height.toFloat()
                         }
                 ) {
@@ -227,8 +248,13 @@ private fun DraggableCardPreview() {
             image = "https://example.com/image2.jpg",
             description = "Description for Character 2",
             tags = listOf("優しい", "天真爛漫", "金髪碧眼", "ロングヘア"),
-            contributor = "Contributor 1"
+            userName = "Contributor 1",
+            likes = 10,
+            postedAt = Timestamp.now()
         ),
-        onSwiped = {}
+        onSwipedRight = {},
+        onSwipedUp = {},
+        onSwipedLeft = {},
+        onDragProgress = { _, _ -> }
     )
 }

@@ -1,9 +1,13 @@
 package com.example.charactermatchingapp.data
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.example.charactermatchingapp.domain.matching.model.Post
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 
 class PostRepository {
@@ -40,35 +44,22 @@ class PostRepository {
     }
 
     /**
-     * 特定ユーザーの投稿を一度にすべて取得する
+     * 特定ユーザーの投稿をページングで取得する
      * @param accountId 取得したいユーザーのID
-     * @return Postのリスト
+     * @return PostのPagingDataを含むFlow
      */
-    suspend fun getUserArtworks(accountId: String): List<Post> {
-        return try {
-            val query = firestore.collection("artworks")
-                .whereEqualTo("authorId", accountId)
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .limit(100) // 念のため上限を設定
+    fun getUserArtworks(accountId: String): Flow<PagingData<Post>> {
+        val query = firestore.collection("artworks")
+            .whereEqualTo("authorId", accountId)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
 
-            val documents = query.get().await()
-
-            // 取得したドキュメントをPostオブジェクトのリストに変換
-            return documents.map { document ->
-                Post(
-                    id = document.id,
-                    userName = document.getString("authorName") ?: "",
-                    userIconResId = document.getString("iconImageUrl") ?: "",
-                    characterName = document.getString("characterName") ?: "",
-                    characterText = document.getString("characterDescription") ?: "",
-                    postImageResId = document.getString("imageUrl") ?: "",
-                    posttags = document.get("tags") as? List<String> ?: emptyList()
-                )
-            }
-        } catch (e: Exception) {
-            println("Error getting user artworks: ${e.message}")
-            emptyList()
-        }
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { PostPagingSource(query) }
+        ).flow
     }
     /**
      * 特定ユーザーがいいねした投稿をすべて取得する
