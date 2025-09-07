@@ -27,6 +27,7 @@ import com.example.charactermatchingapp.presentation.auth.SignUpScreen
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingScreen
 import com.example.charactermatchingapp.presentation.matching.CharacterMatchingViewModel
 import com.example.charactermatchingapp.presentation.recommendation.RecommendationScreen
+import com.example.charactermatchingapp.ui.theme.ContainerColor
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.Serializable
@@ -104,7 +105,7 @@ fun MainNavigation(
                 )
             }
         },
-        containerColor = Color(0xFF363636),
+        containerColor = ContainerColor,
         modifier = modifier
     ) { innerPadding ->
         NavigationHost(
