@@ -33,6 +33,7 @@ import com.example.charactermatchingapp.presentation.post.PostViewModel
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 
@@ -110,7 +111,8 @@ fun MainNavigation(
         NavigationHost(
             navController = navController,
             modifier = Modifier.padding(innerPadding),
-            snackbarHostState = snackbarHostState
+            snackbarHostState = snackbarHostState,
+            scope = scope
         )
     }
 }
@@ -118,7 +120,8 @@ fun MainNavigation(
 private fun NavigationHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    scope: CoroutineScope
 ) {
     val startDestination = Screen.Login
     val scope = rememberCoroutineScope()
@@ -195,8 +198,8 @@ private fun NavigationHost(
             }
             SignUpScreen(
                 uiState = authUiState,
-                onSignUp = { email, password ->
-                    authViewModel.signUp(email, password)
+                onSignUp = { email, password, displayName ->
+                    authViewModel.signUp(email, password, displayName)
                 },
                 onNavigateToLogin = {
                     navController.navigate(Screen.Login)

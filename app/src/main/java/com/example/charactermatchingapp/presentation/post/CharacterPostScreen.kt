@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.charactermatchingapp.domain.post.model.PostInfo
 import com.example.charactermatchingapp.ui.theme.CharacterMatchingAppTheme
+import com.google.accompanist.flowlayout.FlowRow
 
 
 @OptIn(ExperimentalMaterial3Api::class)
