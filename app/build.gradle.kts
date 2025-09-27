@@ -80,6 +80,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("io.insert-koin:koin-android:4.1.1")
     implementation("io.insert-koin:koin-androidx-compose:4.1.1")
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
     testImplementation("io.insert-koin:koin-test:4.1.1")
     testImplementation("io.insert-koin:koin-test-junit4:4.1.1")
     testImplementation("io.mockk:mockk:1.14.5")

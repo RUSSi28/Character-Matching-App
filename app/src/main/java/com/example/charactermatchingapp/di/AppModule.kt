@@ -1,5 +1,6 @@
 package com.example.charactermatchingapp.di
 
+import com.example.charactermatchingapp.data.auth.dataSource.DataStoreManager
 import com.example.charactermatchingapp.data.auth.repository.AuthRepositoryImpl
 import com.example.charactermatchingapp.data.auth.service.CurrentUserProviderImpl
 import com.example.charactermatchingapp.data.gallery.repository.GalleryRepositoryImpl
@@ -14,12 +15,12 @@ import com.example.charactermatchingapp.domain.gallery.repository.GalleryReposit
 import com.example.charactermatchingapp.domain.matching.repository.CharacterMatchingRepository
 import com.example.charactermatchingapp.domain.recommendation.repository.RecommendationRepository
 import com.example.charactermatchingapp.domain.user.repository.UserRepository
+import com.example.charactermatchingapp.presentation.SharedViewModel
 import com.example.charactermatchingapp.presentation.auth.AuthViewModel
 import com.example.charactermatchingapp.presentation.gallery.GalleryViewModel
+import com.example.charactermatchingapp.presentation.matching.CharacterMatchingViewModel
 import com.example.charactermatchingapp.presentation.post.PostViewModel
 import com.example.charactermatchingapp.presentation.recommendation.RecommendationViewModel
-import com.example.charactermatchingapp.presentation.SharedViewModel
-import com.example.charactermatchingapp.presentation.matching.CharacterMatchingViewModel
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -37,13 +38,16 @@ val appModule = module {
     single<FirebaseStorage> { FirebaseStorage.getInstance() }
     single<CurrentUserProvider> { CurrentUserProviderImpl(get()) }
 
-    single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
+    // LocalDatabase
+    single<DataStoreManager> { DataStoreManager(get()) }
+
+    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get()) }
     viewModelOf(::AuthViewModel)
 
     single<GalleryRepository> { GalleryRepositoryImpl(get()) }
     viewModelOf(::GalleryViewModel)
 
-    single<PostRepository> { PostRepositoryImpl(get(),get()) }
+    single<PostRepository> { PostRepositoryImpl(get(), get()) }
     viewModelOf(::PostViewModel)
 
     // Recommendation機能
@@ -51,7 +55,7 @@ val appModule = module {
     single<RecommendationRepository> { RecommendationRepositoryImpl() }
     viewModelOf(::RecommendationViewModel)
 
-    single<CharacterMatchingRepository> { CharacterMatchingRepositoryImpl(get(),get()) }
+    single<CharacterMatchingRepository> { CharacterMatchingRepositoryImpl(get(), get()) }
     viewModelOf(::CharacterMatchingViewModel)
 
     viewModelOf(::SharedViewModel)

@@ -1,11 +1,15 @@
 package com.example.charactermatchingapp.presentation.auth
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.charactermatchingapp.domain.auth.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -21,9 +25,27 @@ data class AuthUiState(
 class AuthViewModel(
     private val authRepository: AuthRepository
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
+    private val mail = authRepository.mail.stateIn(viewModelScope, SharingStarted.Eagerly, "")
+    private val password =
+        authRepository.password.stateIn(viewModelScope, SharingStarted.Eagerly, "")
+
+    init {
+        Log.d("AuthViewModel", "mail=${mail.value},pass=${password.value}")
+        if (mail.value != "" && password.value != "") {
+            login(email = mail.value, password = password.value)
+        }
+        viewModelScope.launch {
+            combine(mail, password) { m, p -> m to p }
+                .collect { (m, p) ->
+                    Log.d("AuthViewModel", "mail=$m, pass=$p")
+                    if (m.isNotEmpty() && p.isNotEmpty()) {
+                        login(m, p)
+                    }
+                }
+        }
+    }
 
     fun signUp(email: String, password: String, displayName: String) {
         viewModelScope.launch {
